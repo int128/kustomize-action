@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echoserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: echoserver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: echoserver
+    spec:
+      containers:
+        - image: envoyproxy/envoy:latest
+          name: envoy
