@@ -2,10 +2,30 @@
 # yarn lockfile v1
 
 
-"@actions/core@1.4.0":
+"@actions/core@1.4.0", "@actions/core@^1.2.6":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.4.0.tgz#cf2e6ee317e314b03886adfeb20e448d50d6e524"
   integrity sha512-CGx2ilGq5i7zSLgiiGUtBCxhRRxibJYU6Fim0Q1Wg2aQL2LTnF27zbqZOrxfvFQ55eSBW0L8uVStgtKMpa0Qlg==
+
+"@actions/exec@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@actions/exec/-/exec-1.1.0.tgz#53441d968e56d2fec69ad3f15773d4d94e01162c"
+  integrity sha512-LImpN9AY0J1R1mEYJjVJfSZWU4zYOlEcwSTgPve1rFQqK5AwrEs6uWW5Rv70gbDIQIAUwI86z6B+9mPK4w9Sbg==
+  dependencies:
+    "@actions/io" "^1.0.1"
+
+"@actions/glob@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@actions/glob/-/glob-0.2.0.tgz#38e939ebd7c18ded5b8eee642583875f195cae63"
+  integrity sha512-mqE2a7I66kxcvsdwxs/filQwZsq25IfktMaviGfDB51v6Q3bvxnV7mFsZnvYtLhqGZbPxwBnH8AD3UYaOWb//w==
+  dependencies:
+    "@actions/core" "^1.2.6"
+    minimatch "^3.0.4"
+
+"@actions/io@^1.0.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@actions/io/-/io-1.1.1.tgz#4a157406309e212ab27ed3ae30e8c1d641686a66"
+  integrity sha512-Qi4JoKXjmE0O67wAOH6y0n26QXhMKMFo7GD/4IXNVcrtLjUlGjGuVys6pQgwF3ArfGTQu0XpqaNr0YhED2RaRA==
 
 "@babel/code-frame@7.12.11":
   version "7.12.11"

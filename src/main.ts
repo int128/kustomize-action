@@ -4,7 +4,9 @@ import { run } from './run'
 const main = async (): Promise<void> => {
   try {
     await run({
-      name: core.getInput('name', { required: true }),
+      pattern: core.getInput('pattern', { required: true }),
+      baseDir: core.getInput('base-directory', { required: true }),
+      maxProcess: parseInt(core.getInput('max-process', { required: true })),
     })
   } catch (error) {
     core.setFailed(error.message)

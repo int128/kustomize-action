@@ -36,7 +36,8 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - name: e2e-test
+      - id: e2e-test
         uses: ./
         with:
-          name: foo
+          pattern: tests/fixtures/overlays/*/kustomization.yaml
+      - run: find ${{ steps.e2e-test.outputs.directory }}
