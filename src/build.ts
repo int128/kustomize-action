@@ -3,7 +3,7 @@ import * as exec from '@actions/exec'
 import * as io from '@actions/io'
 import * as path from 'path'
 
-type Kustomization = {
+export type Kustomization = {
   kustomizationDir: string
   outputFile: string
 }
