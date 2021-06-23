@@ -41,3 +41,7 @@ jobs:
         with:
           pattern: tests/fixtures/overlays/*/kustomization.yaml
       - run: find ${{ steps.e2e-test.outputs.directory }}
+      - run: |
+          cat <<EOF
+          ${{ steps.e2e-test.outputs.files }}
+          EOF
