@@ -15,6 +15,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const outputBaseDir = await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`)
   core.setOutput('directory', outputBaseDir)
   core.info(`writing to ${outputBaseDir}`)
+
   const kustomizations = await globKustomization(inputs.pattern, outputBaseDir)
   await kustomizeBuild(kustomizations, inputs.maxProcess)
+
+  const outputFiles = kustomizations.map((k) => k.outputFile).join('\n')
+  core.setOutput('files', outputFiles)
 }
