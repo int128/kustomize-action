@@ -1,6 +1,8 @@
 # kustomize-action [![ts](https://github.com/int128/kustomize-action/actions/workflows/ts.yaml/badge.svg)](https://github.com/int128/kustomize-action/actions/workflows/ts.yaml)
 
 This is an action to run `kustomize build` in parallel.
+`kustomize build` takes a long time if it loads an external resource such as HTTPS or Git.
+This action would reduce time by paralell build.
 
 
 ## Getting Started
