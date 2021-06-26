@@ -22,23 +22,23 @@ jobs:
       - run: find ${{ steps.kustomize.outputs.directory }}
 ```
 
-### Outcome
+### Example
 
-For example, when the pattern matches to the following files:
+When `pattern` of inputs matches to the following files:
 
 ```
 overlays/development/kustomization.yaml
 overlays/production/kustomization.yaml
 ```
 
-This action generates the following files:
+This action writes the generated manifests to a temporary directory, such as:
 
 ```
 /tmp/somewhere/overlays/development/generated.yaml
 /tmp/somewhere/overlays/production/generated.yaml
 ```
 
-You can get the base directory `/tmp/somewhere` from `outputs.directory`.
+You can get the directory `/tmp/somewhere` from `directory` of outputs.
 
 
 ## Inputs
