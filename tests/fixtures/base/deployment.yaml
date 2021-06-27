@@ -13,5 +13,5 @@ spec:
         app.kubernetes.io/name: echoserver
     spec:
       containers:
-        - image: envoyproxy/envoy:latest
+        - image: envoyproxy/envoy:v1.18-latest
           name: envoy
