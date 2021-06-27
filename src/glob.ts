@@ -1,11 +1,7 @@
 import * as glob from '@actions/glob'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-
-export type Kustomization = {
-  kustomizationDir: string
-  outputFile: string
-}
+import { Kustomization } from './build'
 
 export const globKustomization = async (patterns: string, outputBaseDir: string): Promise<Kustomization[]> => {
   const cwd = process.cwd()
@@ -21,8 +17,8 @@ export const globKustomization = async (patterns: string, outputBaseDir: string)
 
     const kustomizationDir = path.dirname(p)
     const relativeDir = path.relative(cwd, kustomizationDir)
-    const outputFile = path.join(outputBaseDir, relativeDir, 'generated.yaml')
-    kustomizations.push({ kustomizationDir, outputFile })
+    const outputDir = path.join(outputBaseDir, relativeDir)
+    kustomizations.push({ kustomizationDir, outputDir })
   }
   return kustomizations
 }

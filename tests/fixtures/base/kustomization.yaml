@@ -1,2 +1,3 @@
 resources:
-  - echoserver.yaml
+  - deployment.yaml
+  - service.yaml
