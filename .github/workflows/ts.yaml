@@ -36,12 +36,29 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - id: e2e-test
+      - id: kustomize-single
         uses: ./
         with:
           pattern: tests/fixtures/overlays/*/kustomization.yaml
-      - run: find ${{ steps.e2e-test.outputs.directory }}
+      - run: find ${{ steps.kustomize-single.outputs.directory }}
       - run: |
           cat <<EOF
-          ${{ steps.e2e-test.outputs.files }}
+          ${{ steps.kustomize-single.outputs.files }}
           EOF
+      - run: test -f ${{ steps.kustomize-single.outputs.directory }}/tests/fixtures/overlays/development/generated.yaml
+      - run: test -f ${{ steps.kustomize-single.outputs.directory }}/tests/fixtures/overlays/production/generated.yaml
+
+      - id: kustomize-individual
+        uses: ./
+        with:
+          pattern: tests/fixtures/overlays/*/kustomization.yaml
+          write-individual-files: true
+      - run: find ${{ steps.kustomize-individual.outputs.directory }}
+      - run: |
+          cat <<EOF
+          ${{ steps.kustomize-individual.outputs.files }}
+          EOF
+      - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/development/v1_service_echoserver.yaml
+      - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/development/apps_v1_deployment_echoserver.yaml
+      - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/production/v1_service_echoserver.yaml
+      - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/production/apps_v1_deployment_echoserver.yaml

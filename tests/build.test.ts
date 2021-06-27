@@ -10,7 +10,7 @@ const execMock = exec.exec as jest.Mock<Promise<number>>
 const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>>
 
 test('nothing', async () => {
-  await kustomizeBuild([], 1)
+  await kustomizeBuild([], { maxProcess: 1, writeIndividualFiles: false })
   expect(mkdirPMock).not.toHaveBeenCalled()
   expect(execMock).not.toHaveBeenCalled()
 })
@@ -21,10 +21,10 @@ test('build a directory', async () => {
     [
       {
         kustomizationDir: '/fixtures/development',
-        outputFile: '/output/development/generated.yaml',
+        outputDir: '/output/development',
       },
     ],
-    3
+    { maxProcess: 3, writeIndividualFiles: false }
   )
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
@@ -37,6 +37,23 @@ test('build a directory', async () => {
   ])
 })
 
+test('build a directory to individual files', async () => {
+  execMock.mockResolvedValue(0)
+  await kustomizeBuild(
+    [
+      {
+        kustomizationDir: '/fixtures/development',
+        outputDir: '/output/development',
+      },
+    ],
+    { maxProcess: 3, writeIndividualFiles: true }
+  )
+  expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
+  expect(execMock).toHaveBeenCalledTimes(1)
+  expect(execMock.mock.calls[0][0]).toBe('kustomize')
+  expect(execMock.mock.calls[0][1]).toStrictEqual(['build', '/fixtures/development', '-o', '/output/development'])
+})
+
 test('build a directory with an error', async () => {
   execMock.mockResolvedValue(1)
   await expect(
@@ -44,10 +61,10 @@ test('build a directory with an error', async () => {
       [
         {
           kustomizationDir: '/fixtures/development',
-          outputFile: '/output/development/generated.yaml',
+          outputDir: '/output/development',
         },
       ],
-      3
+      { maxProcess: 3, writeIndividualFiles: false }
     )
   ).rejects.toThrowError()
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -65,30 +82,33 @@ test.each`
   ${3}     | ${2}
   ${3}     | ${3}
   ${3}     | ${4}
-`('build $overlays directories using $maxProcess process', async ({ overlays, maxProcess }) => {
-  execMock.mockResolvedValue(0)
+`(
+  'build $overlays directories using $maxProcess process',
+  async ({ overlays, maxProcess }: { overlays: number; maxProcess: number }) => {
+    execMock.mockResolvedValue(0)
 
-  const kustomizations: Kustomization[] = []
-  for (let i = 0; i < overlays; i++) {
-    kustomizations.push({
-      kustomizationDir: `/input/fixture${i}`,
-      outputFile: `/output/fixture${i}/generated.yaml`,
-    })
-  }
-  await kustomizeBuild(kustomizations, maxProcess)
+    const kustomizations: Kustomization[] = []
+    for (let i = 0; i < overlays; i++) {
+      kustomizations.push({
+        kustomizationDir: `/input/fixture${i}`,
+        outputDir: `/output/fixture${i}`,
+      })
+    }
+    await kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })
 
-  expect(execMock).toHaveBeenCalledTimes(overlays)
-  for (let i = 0; i < overlays; i++) {
-    expect(mkdirPMock).toHaveBeenCalledWith(`/output/fixture${i}`)
-    expect(execMock.mock.calls[i][0]).toBe('kustomize')
-    expect(execMock.mock.calls[i][1]).toStrictEqual([
-      'build',
-      `/input/fixture${i}`,
-      '-o',
-      `/output/fixture${i}/generated.yaml`,
-    ])
+    expect(execMock).toHaveBeenCalledTimes(overlays)
+    for (let i = 0; i < overlays; i++) {
+      expect(mkdirPMock).toHaveBeenCalledWith(`/output/fixture${i}`)
+      expect(execMock.mock.calls[i][0]).toBe('kustomize')
+      expect(execMock.mock.calls[i][1]).toStrictEqual([
+        'build',
+        `/input/fixture${i}`,
+        '-o',
+        `/output/fixture${i}/generated.yaml`,
+      ])
+    }
   }
-})
+)
 
 test.each`
   overlays | maxProcess | exitCodes
@@ -101,7 +121,7 @@ test.each`
   ${4}     | ${2}       | ${[0, 0, 0, 1]}
 `(
   'build $overlays directories using $maxProcess process with error $exitCodes',
-  async ({ overlays, maxProcess, exitCodes }) => {
+  async ({ overlays, maxProcess, exitCodes }: { overlays: number; maxProcess: number; exitCodes: number[] }) => {
     for (const exitCode of exitCodes) {
       execMock.mockResolvedValueOnce(exitCode)
     }
@@ -110,10 +130,10 @@ test.each`
     for (let i = 0; i < overlays; i++) {
       kustomizations.push({
         kustomizationDir: `/input/fixture${i}`,
-        outputFile: `/output/fixture${i}/generated.yaml`,
+        outputDir: `/output/fixture${i}`,
       })
     }
-    await expect(kustomizeBuild(kustomizations, maxProcess)).rejects.toThrowError()
+    await expect(kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })).rejects.toThrowError()
 
     expect(execMock).toHaveBeenCalledTimes(overlays)
     for (let i = 0; i < overlays; i++) {

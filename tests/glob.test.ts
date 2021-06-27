@@ -1,4 +1,5 @@
-import { globKustomization, Kustomization } from '../src/glob'
+import { Kustomization } from '../src/build'
+import { globKustomization } from '../src/glob'
 
 test('run successfully', async () => {
   process.chdir(__dirname)
@@ -6,11 +7,11 @@ test('run successfully', async () => {
   expect(got).toStrictEqual<Kustomization[]>([
     {
       kustomizationDir: `${__dirname}/fixtures/overlays/development`,
-      outputFile: '/tmp/foo/fixtures/overlays/development/generated.yaml',
+      outputDir: '/tmp/foo/fixtures/overlays/development',
     },
     {
       kustomizationDir: `${__dirname}/fixtures/overlays/production`,
-      outputFile: '/tmp/foo/fixtures/overlays/production/generated.yaml',
+      outputDir: '/tmp/foo/fixtures/overlays/production',
     },
   ])
 })

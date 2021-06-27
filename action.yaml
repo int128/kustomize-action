@@ -12,6 +12,10 @@ inputs:
     description: max number of kustomize processes
     required: true
     default: '5'
+  write-individual-files:
+    description: set true to write individual files
+    required: true
+    default: 'false'
 outputs:
   directory:
     description: directory to results of kustomize build

@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as glob from '@actions/glob'
 import * as os from 'os'
 import { promises as fs } from 'fs'
 import { globKustomization } from './glob'
@@ -8,6 +9,7 @@ type Inputs = {
   pattern: string
   baseDir: string
   maxProcess: number
+  writeIndividualFiles: boolean
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
@@ -17,8 +19,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.info(`writing to ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.pattern, outputBaseDir)
-  await kustomizeBuild(kustomizations, inputs.maxProcess)
+  await kustomizeBuild(kustomizations, inputs)
 
-  const outputFiles = kustomizations.map((k) => k.outputFile).join('\n')
-  core.setOutput('files', outputFiles)
+  const globber = await glob.create(outputBaseDir, { matchDirectories: false })
+  const outputFiles = await globber.glob()
+  core.setOutput('files', outputFiles.join('\n'))
 }

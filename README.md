@@ -22,8 +22,6 @@ jobs:
       - run: find ${{ steps.kustomize.outputs.directory }}
 ```
 
-### Example
-
 When `pattern` of inputs matches to the following files:
 
 ```
@@ -41,6 +39,27 @@ This action writes the generated manifests to a temporary directory, such as:
 You can get the directory `/tmp/somewhere` from `directory` of outputs.
 
 
+### Write individual files
+
+You can set `write-individual-files` to write individual files (see [kustomize#960](https://github.com/kubernetes-sigs/kustomize/pull/960)).
+
+```yaml
+      - uses: int128/kustomize-action@v1
+        with:
+          pattern: overlays/*/kustomization.yaml
+          write-individual-files: true
+```
+
+This action writes the individual manifests as follows:
+
+```
+/tmp/somewhere/overlays/development/apps_v1_deployment_echoserver.yaml
+/tmp/somewhere/overlays/development/v1_service_echoserver.yaml
+/tmp/somewhere/overlays/production/apps_v1_deployment_echoserver.yaml
+/tmp/somewhere/overlays/production/v1_service_echoserver.yaml
+```
+
+
 ## Inputs
 
 | Name | Required | Description
@@ -48,6 +67,7 @@ You can get the directory `/tmp/somewhere` from `directory` of outputs.
 | `pattern` | yes | glob patterns to `kustomization.yaml`
 | `base-directory` | no | base directory to compute a relative path to `kustomization.yaml` (default to workspace)
 | `max-process` | no | max number of kustomize processes (default to 5)
+| `write-individual-files` | no | set true to write individual files (default to `false`)
 
 
 ## Outputs

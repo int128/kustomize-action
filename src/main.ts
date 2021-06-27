@@ -7,6 +7,7 @@ const main = async (): Promise<void> => {
       pattern: core.getInput('pattern', { required: true }),
       baseDir: core.getInput('base-directory', { required: true }),
       maxProcess: parseInt(core.getInput('max-process', { required: true })),
+      writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),
     })
   } catch (error) {
     core.setFailed(error.message)

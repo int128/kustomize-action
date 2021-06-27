@@ -5,14 +5,23 @@ import * as path from 'path'
 
 export type Kustomization = {
   kustomizationDir: string
-  outputFile: string
+  outputDir: string
 }
 
-export const kustomizeBuild = async (kustomizations: Kustomization[], maxProcess: number): Promise<void> => {
+export type KustomizeBuildOption = {
+  maxProcess: number
+  writeIndividualFiles: boolean
+}
+
+export const kustomizeBuild = async (kustomizations: Kustomization[], option: KustomizeBuildOption): Promise<void> => {
+  if (option.maxProcess < 1) {
+    throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
+  }
+
   const queue = kustomizations.concat()
   const workers: Promise<boolean>[] = []
-  for (let index = 0; index < maxProcess; index++) {
-    workers.push(worker(queue))
+  for (let index = 0; index < option.maxProcess; index++) {
+    workers.push(worker(queue, option))
   }
   const anyErrors = await Promise.all(workers)
   if (anyErrors.includes(true)) {
@@ -22,37 +31,45 @@ export const kustomizeBuild = async (kustomizations: Kustomization[], maxProcess
   core.info(`all of kustomize build successfully finished`)
 }
 
-const worker = async (queue: Kustomization[]): Promise<boolean> => {
+const worker = async (queue: Kustomization[], option: KustomizeBuildOption): Promise<boolean> => {
   for (let anyError = false; ; ) {
     const task = queue.shift()
     if (task === undefined) {
       return anyError // end of tasks
     }
-
-    await io.mkdirP(path.dirname(task.outputFile))
-
-    const args = ['build', task.kustomizationDir, '-o', task.outputFile]
-    const lines: string[] = []
-    const code = await exec.exec('kustomize', args, {
-      silent: true,
-      ignoreReturnCode: true,
-      listeners: {
-        stdline: (line) => lines.push(line),
-        errline: (line) => lines.push(line),
-      },
-    })
-
-    core.startGroup(`kustomize build ${task.kustomizationDir}`)
-    core.info(lines.join('\n'))
-    if (code === 0) {
-      core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-    } else {
-      core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-    }
-    core.endGroup()
-
+    const code = await build(task, option)
     if (code !== 0) {
       anyError = true
     }
   }
+}
+
+const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<number> => {
+  await io.mkdirP(task.outputDir)
+
+  let args
+  if (option.writeIndividualFiles) {
+    args = ['build', task.kustomizationDir, '-o', task.outputDir]
+  } else {
+    args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
+  }
+  const lines: string[] = []
+  const code = await exec.exec('kustomize', args, {
+    silent: true,
+    ignoreReturnCode: true,
+    listeners: {
+      stdline: (line) => lines.push(line),
+      errline: (line) => lines.push(line),
+    },
+  })
+
+  core.startGroup(`kustomize build ${task.kustomizationDir}`)
+  core.info(lines.join('\n'))
+  if (code === 0) {
+    core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
+  } else {
+    core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
+  }
+  core.endGroup()
+  return code
 }
