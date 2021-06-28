@@ -62,3 +62,18 @@ jobs:
       - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/development/apps_v1_deployment_echoserver.yaml
       - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/production/v1_service_echoserver.yaml
       - run: test -f ${{ steps.kustomize-individual.outputs.directory }}/tests/fixtures/overlays/production/apps_v1_deployment_echoserver.yaml
+
+      - id: kustomize-single-with-extra-files
+        uses: ./
+        with:
+          kustomization: tests/fixtures/overlays/*/kustomization.yaml
+          extra-files: tests/fixtures/overlays/*/metadata.yaml
+      - run: find ${{ steps.kustomize-single-with-extra-files.outputs.directory }}
+      - run: |
+          cat <<EOF
+          ${{ steps.kustomize-single-with-extra-files.outputs.files }}
+          EOF
+      - run: test -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/development/generated.yaml
+      - run: test -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/development/metadata.yaml
+      - run: test -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/production/generated.yaml
+      - run: test ! -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/production/metadata.yaml

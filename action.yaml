@@ -4,6 +4,9 @@ inputs:
   kustomization:
     description: glob patterns to kustomization.yaml
     required: true
+  extra-files:
+    description: glob patterns to extra files to copy
+    required: false
   base-directory:
     description: base directory to compute a relative path of kustomization.yaml
     required: true
