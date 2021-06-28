@@ -39,7 +39,7 @@ jobs:
       - id: kustomize-single
         uses: ./
         with:
-          pattern: tests/fixtures/overlays/*/kustomization.yaml
+          kustomization: tests/fixtures/overlays/*/kustomization.yaml
       - run: find ${{ steps.kustomize-single.outputs.directory }}
       - run: |
           cat <<EOF
@@ -51,7 +51,7 @@ jobs:
       - id: kustomize-individual
         uses: ./
         with:
-          pattern: tests/fixtures/overlays/*/kustomization.yaml
+          kustomization: tests/fixtures/overlays/*/kustomization.yaml
           write-individual-files: true
       - run: find ${{ steps.kustomize-individual.outputs.directory }}
       - run: |

@@ -4,7 +4,7 @@ import { run } from './run'
 const main = async (): Promise<void> => {
   try {
     await run({
-      pattern: core.getInput('pattern', { required: true }),
+      kustomization: core.getInput('kustomization', { required: true }),
       baseDir: core.getInput('base-directory', { required: true }),
       maxProcess: parseInt(core.getInput('max-process', { required: true })),
       writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),

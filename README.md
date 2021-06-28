@@ -18,7 +18,7 @@ jobs:
       - uses: int128/kustomize-action@v1
         id: kustomize
         with:
-          pattern: overlays/*/kustomization.yaml
+          kustomization: overlays/*/kustomization.yaml
       - run: find ${{ steps.kustomize.outputs.directory }}
 ```
 
@@ -46,7 +46,7 @@ You can set `write-individual-files` to write individual files (see [kustomize#9
 ```yaml
       - uses: int128/kustomize-action@v1
         with:
-          pattern: overlays/*/kustomization.yaml
+          kustomization: overlays/*/kustomization.yaml
           write-individual-files: true
 ```
 
@@ -64,7 +64,7 @@ This action writes the individual manifests as follows:
 
 | Name | Required | Description
 |------|----------|------------
-| `pattern` | yes | glob patterns to `kustomization.yaml`
+| `kustomization` | yes | glob patterns to `kustomization.yaml`
 | `base-directory` | no | base directory to compute a relative path to `kustomization.yaml` (default to workspace)
 | `max-process` | no | max number of kustomize processes (default to 5)
 | `write-individual-files` | no | set true to write individual files (default to `false`)
