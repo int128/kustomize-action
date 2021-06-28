@@ -5,6 +5,7 @@ const main = async (): Promise<void> => {
   try {
     await run({
       kustomization: core.getInput('kustomization', { required: true }),
+      extraFiles: core.getInput('extra-files'),
       baseDir: core.getInput('base-directory', { required: true }),
       maxProcess: parseInt(core.getInput('max-process', { required: true })),
       writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),

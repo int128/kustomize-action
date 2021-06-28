@@ -60,11 +60,32 @@ This action writes the individual manifests as follows:
 ```
 
 
+## Copy extra files
+
+You can set `extra-files` to copy the extra files with the results of `kustomize build`.
+
+```yaml
+      - uses: int128/kustomize-action@v1
+        with:
+          kustomization: overlays/*/kustomization.yaml
+          extra-files: overlays/*/metadata.yaml
+```
+
+This action writes the generated manifests with the extra files as follows:
+
+```
+/tmp/somewhere/overlays/development/generated.yaml
+/tmp/somewhere/overlays/development/metadata.yaml
+/tmp/somewhere/overlays/production/generated.yaml
+```
+
+
 ## Inputs
 
 | Name | Required | Description
 |------|----------|------------
 | `kustomization` | yes | glob patterns to `kustomization.yaml`
+| `extra-files` | no | glob patterns to extra files to copy
 | `base-directory` | no | base directory to compute a relative path to `kustomization.yaml` (default to workspace)
 | `max-process` | no | max number of kustomize processes (default to 5)
 | `write-individual-files` | no | set true to write individual files (default to `false`)

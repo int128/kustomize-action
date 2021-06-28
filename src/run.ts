@@ -4,9 +4,11 @@ import * as os from 'os'
 import { promises as fs } from 'fs'
 import { globKustomization } from './glob'
 import { kustomizeBuild } from './build'
+import { copyExtraFiles } from './copy'
 
 type Inputs = {
   kustomization: string
+  extraFiles: string
   baseDir: string
   maxProcess: number
   writeIndividualFiles: boolean
@@ -20,6 +22,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
   await kustomizeBuild(kustomizations, inputs)
+  await copyExtraFiles(inputs.extraFiles, outputBaseDir)
 
   const globber = await glob.create(outputBaseDir, { matchDirectories: false })
   const outputFiles = await globber.glob()
