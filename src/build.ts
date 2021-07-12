@@ -63,13 +63,17 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     },
   })
 
-  core.startGroup(`kustomize build ${task.kustomizationDir}`)
-  core.info(lines.join('\n'))
   if (code === 0) {
+    core.startGroup(task.kustomizationDir)
     core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-  } else {
-    core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
+    core.info(lines.join('\n'))
+    core.endGroup()
+    return code
   }
+
+  core.startGroup(`\u001b[31mFAIL\u001b[0m ${task.kustomizationDir}`)
+  core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
+  core.info(lines.join('\n'))
   core.endGroup()
   return code
 }
