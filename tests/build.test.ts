@@ -10,14 +10,15 @@ const execMock = exec.exec as jest.Mock<Promise<number>>
 const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>>
 
 test('nothing', async () => {
-  await kustomizeBuild([], { maxProcess: 1, writeIndividualFiles: false })
+  const errors = await kustomizeBuild([], { maxProcess: 1, writeIndividualFiles: false })
+  expect(errors).toStrictEqual([])
   expect(mkdirPMock).not.toHaveBeenCalled()
   expect(execMock).not.toHaveBeenCalled()
 })
 
 test('build a directory', async () => {
   execMock.mockResolvedValue(0)
-  await kustomizeBuild(
+  const errors = await kustomizeBuild(
     [
       {
         kustomizationDir: '/fixtures/development',
@@ -26,6 +27,7 @@ test('build a directory', async () => {
     ],
     { maxProcess: 3, writeIndividualFiles: false }
   )
+  expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
   expect(execMock.mock.calls[0][0]).toBe('kustomize')
@@ -39,7 +41,7 @@ test('build a directory', async () => {
 
 test('build a directory to individual files', async () => {
   execMock.mockResolvedValue(0)
-  await kustomizeBuild(
+  const errors = await kustomizeBuild(
     [
       {
         kustomizationDir: '/fixtures/development',
@@ -48,6 +50,7 @@ test('build a directory to individual files', async () => {
     ],
     { maxProcess: 3, writeIndividualFiles: true }
   )
+  expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
   expect(execMock.mock.calls[0][0]).toBe('kustomize')
@@ -56,17 +59,16 @@ test('build a directory to individual files', async () => {
 
 test('build a directory with an error', async () => {
   execMock.mockResolvedValue(1)
-  await expect(
-    kustomizeBuild(
-      [
-        {
-          kustomizationDir: '/fixtures/development',
-          outputDir: '/output/development',
-        },
-      ],
-      { maxProcess: 3, writeIndividualFiles: false }
-    )
-  ).rejects.toThrowError()
+  const errors = await kustomizeBuild(
+    [
+      {
+        kustomizationDir: '/fixtures/development',
+        outputDir: '/output/development',
+      },
+    ],
+    { maxProcess: 3, writeIndividualFiles: false }
+  )
+  expect(errors.length).toBe(1)
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
 })
@@ -94,8 +96,9 @@ test.each`
         outputDir: `/output/fixture${i}`,
       })
     }
-    await kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })
+    const errors = await kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })
 
+    expect(errors).toStrictEqual([])
     expect(execMock).toHaveBeenCalledTimes(overlays)
     for (let i = 0; i < overlays; i++) {
       expect(mkdirPMock).toHaveBeenCalledWith(`/output/fixture${i}`)
@@ -133,8 +136,9 @@ test.each`
         outputDir: `/output/fixture${i}`,
       })
     }
-    await expect(kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })).rejects.toThrowError()
+    const errors = await kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })
 
+    expect(errors.length).toBe(1)
     expect(execMock).toHaveBeenCalledTimes(overlays)
     for (let i = 0; i < overlays; i++) {
       expect(mkdirPMock).toHaveBeenCalledWith(`/output/fixture${i}`)

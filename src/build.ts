@@ -13,38 +13,44 @@ export type KustomizeBuildOption = {
   writeIndividualFiles: boolean
 }
 
-export const kustomizeBuild = async (kustomizations: Kustomization[], option: KustomizeBuildOption): Promise<void> => {
+export type KustomizeError = {
+  kustomization: Kustomization
+  code: number
+  message: string
+}
+
+export const kustomizeBuild = async (
+  kustomizations: Kustomization[],
+  option: KustomizeBuildOption
+): Promise<KustomizeError[]> => {
   if (option.maxProcess < 1) {
     throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
   }
 
   const queue = kustomizations.concat()
-  const workers: Promise<boolean>[] = []
+  const workers: Promise<KustomizeError[]>[] = []
   for (let index = 0; index < option.maxProcess; index++) {
     workers.push(worker(queue, option))
   }
-  const anyErrors = await Promise.all(workers)
-  if (anyErrors.includes(true)) {
-    const count = anyErrors.filter((anyError) => anyError).length
-    throw new Error(`kustomize build finished with ${count} error(s)`)
-  }
-  core.info(`all of kustomize build successfully finished`)
+  const errorsOfWorkers = await Promise.all(workers)
+  const errors = ([] as KustomizeError[]).concat(...errorsOfWorkers)
+  return errors
 }
 
-const worker = async (queue: Kustomization[], option: KustomizeBuildOption): Promise<boolean> => {
-  for (let anyError = false; ; ) {
+const worker = async (queue: Kustomization[], option: KustomizeBuildOption): Promise<KustomizeError[]> => {
+  for (const errors: KustomizeError[] = []; ; ) {
     const task = queue.shift()
     if (task === undefined) {
-      return anyError // end of tasks
+      return errors // end of tasks
     }
-    const code = await build(task, option)
-    if (code !== 0) {
-      anyError = true
+    const result = await build(task, option)
+    if (result !== undefined) {
+      errors.push(result)
     }
   }
 }
 
-const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<number> => {
+const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<KustomizeError | void> => {
   await io.mkdirP(task.outputDir)
 
   let args
@@ -62,18 +68,19 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
       errline: (line) => lines.push(line),
     },
   })
+  const message = lines.join('\n')
 
   if (code === 0) {
     core.startGroup(task.kustomizationDir)
     core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-    core.info(lines.join('\n'))
+    core.info(message)
     core.endGroup()
-    return code
+    return
   }
 
   core.startGroup(`\u001b[31mFAIL\u001b[0m ${task.kustomizationDir}`)
   core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-  core.info(lines.join('\n'))
+  core.info(message)
   core.endGroup()
-  return code
+  return { code, message, kustomization: task }
 }
