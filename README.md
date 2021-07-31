@@ -22,21 +22,34 @@ jobs:
       - run: find ${{ steps.kustomize.outputs.directory }}
 ```
 
-When `pattern` of inputs matches to the following files:
+If `kustomization` matches to the following files,
 
 ```
 overlays/development/kustomization.yaml
 overlays/production/kustomization.yaml
 ```
 
-This action writes the generated manifests to a temporary directory, such as:
+This action writes the generated manifests to a temporary directory.
+
+You can get the full-paths from `outputs.files`, for example,
 
 ```
-/tmp/somewhere/overlays/development/generated.yaml
-/tmp/somewhere/overlays/production/generated.yaml
+/tmp/kustomize-action-xyz/overlays/development/generated.yaml
+/tmp/kustomize-action-xyz/overlays/production/generated.yaml
 ```
 
-You can get the directory `/tmp/somewhere` from `directory` of outputs.
+You can get the base directory from `outputs.directory`, for example,
+
+```
+/tmp/kustomize-action-xyz
+```
+
+
+### Post a comment on error
+
+If `kustomize build` returned an error, this action will post a comment to a pull request.
+
+![image](https://user-images.githubusercontent.com/321266/127739402-5f9c6388-bf84-48fe-b7a7-45aed0a7dbfe.png)
 
 
 ### Write individual files
@@ -53,14 +66,14 @@ You can set `write-individual-files` to write individual files (see [kustomize#9
 This action writes the individual manifests as follows:
 
 ```
-/tmp/somewhere/overlays/development/apps_v1_deployment_echoserver.yaml
-/tmp/somewhere/overlays/development/v1_service_echoserver.yaml
-/tmp/somewhere/overlays/production/apps_v1_deployment_echoserver.yaml
-/tmp/somewhere/overlays/production/v1_service_echoserver.yaml
+/tmp/kustomize-action-xyz/overlays/development/apps_v1_deployment_echoserver.yaml
+/tmp/kustomize-action-xyz/overlays/development/v1_service_echoserver.yaml
+/tmp/kustomize-action-xyz/overlays/production/apps_v1_deployment_echoserver.yaml
+/tmp/kustomize-action-xyz/overlays/production/v1_service_echoserver.yaml
 ```
 
 
-## Copy extra files
+### Copy extra files
 
 You can set `extra-files` to copy the extra files with the results of `kustomize build`.
 
@@ -74,9 +87,9 @@ You can set `extra-files` to copy the extra files with the results of `kustomize
 This action writes the generated manifests with the extra files as follows:
 
 ```
-/tmp/somewhere/overlays/development/generated.yaml
-/tmp/somewhere/overlays/development/metadata.yaml
-/tmp/somewhere/overlays/production/generated.yaml
+/tmp/kustomize-action-xyz/overlays/development/generated.yaml
+/tmp/kustomize-action-xyz/overlays/development/metadata.yaml
+/tmp/kustomize-action-xyz/overlays/production/generated.yaml
 ```
 
 
