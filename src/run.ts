@@ -21,7 +21,12 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.info(`writing to ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
-  await kustomizeBuild(kustomizations, inputs)
+  const errors = await kustomizeBuild(kustomizations, inputs)
+  if (errors.length > 0) {
+    throw new Error(`kustomize build finished with ${errors.length} error(s)`)
+  }
+  core.info(`all of kustomize build successfully finished`)
+
   await copyExtraFiles(inputs.extraFiles, outputBaseDir)
 
   const globber = await glob.create(outputBaseDir, { matchDirectories: false })
