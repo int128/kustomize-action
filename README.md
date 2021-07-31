@@ -29,9 +29,8 @@ overlays/development/kustomization.yaml
 overlays/production/kustomization.yaml
 ```
 
-This action writes the generated manifests to a temporary directory.
-
-You can get the full-paths from `outputs.files`, for example,
+this action writes the generated manifests to a temporary directory.
+You can get the paths from `outputs.files`, for example,
 
 ```
 /tmp/kustomize-action-xyz/overlays/development/generated.yaml
