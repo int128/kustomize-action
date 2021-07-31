@@ -77,3 +77,9 @@ jobs:
       - run: test -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/development/metadata.yaml
       - run: test -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/production/generated.yaml
       - run: test ! -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/production/metadata.yaml
+
+      - id: kustomize-error
+        uses: ./
+        with:
+          kustomization: tests/fixtures/invalid/kustomization.yaml
+        continue-on-error: true

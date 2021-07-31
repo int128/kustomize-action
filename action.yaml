@@ -19,6 +19,16 @@ inputs:
     description: set true to write individual files
     required: true
     default: 'false'
+  error-comment-header:
+    description: header in a comment to post on error
+    required: true
+    default: |
+      <!-- kustomization-action -->
+      ## :x: kustomize error
+  token:
+    description: GitHub token to post a comment on error
+    required: true
+    default: ${{ github.token }}
 outputs:
   directory:
     description: directory to results of kustomize build
