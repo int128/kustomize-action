@@ -11,7 +11,7 @@ export const commentErrors = async (octokit: Octokit, errors: KustomizeError[], 
     return
   }
 
-  const body = `
+  const body = `\
 ${header}
 ${errors.map(errorTemplate).join('\n')}
 `
