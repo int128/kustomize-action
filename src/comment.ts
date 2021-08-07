@@ -6,15 +6,17 @@ import { KustomizeError } from './build'
 
 type Octokit = InstanceType<typeof GitHub>
 
-export const commentErrors = async (octokit: Octokit, errors: KustomizeError[], header: string): Promise<void> => {
+type CommentOptions = {
+  header: string
+  footer: string
+}
+
+export const commentErrors = async (octokit: Octokit, errors: KustomizeError[], o: CommentOptions): Promise<void> => {
   if (github.context.payload.pull_request === undefined) {
     return
   }
 
-  const body = `\
-${header}
-${errors.map(errorTemplate).join('\n')}
-`
+  const body = [o.header, errors.map(errorTemplate).join('\n'), o.footer].join('\n')
 
   const { data } = await octokit.rest.issues.createComment({
     owner: github.context.repo.owner,

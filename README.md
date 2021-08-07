@@ -102,6 +102,7 @@ This action writes the generated manifests with the extra files as follows:
 | `max-process` | no | max number of kustomize processes (default to 5)
 | `write-individual-files` | no | set true to write individual files (default to `false`)
 | `error-comment-header` | no | header in a comment to post on error
+| `error-comment-footer` | no | footer in a comment to post on error
 | `token` | no | GitHub token to post a comment on error
 
 

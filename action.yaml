@@ -21,10 +21,14 @@ inputs:
     default: 'false'
   error-comment-header:
     description: header in a comment to post on error
-    required: true
+    required: false
+    default: |
+      ## :x: kustomize error
+  error-comment-footer:
+    description: footer in a comment to post on error
+    required: false
     default: |
       <!-- kustomization-action -->
-      ## :x: kustomize error
   token:
     description: GitHub token to post a comment on error
     required: true
