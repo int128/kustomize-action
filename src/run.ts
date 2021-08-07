@@ -14,6 +14,7 @@ type Inputs = {
   baseDir: string
   maxProcess: number
   writeIndividualFiles: boolean
+  errorComment: boolean
   errorCommentHeader: string
   errorCommentFooter: string
   token: string
@@ -30,7 +31,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
   const errors = await kustomizeBuild(kustomizations, inputs)
   if (errors.length > 0) {
-    await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
+    if (inputs.errorComment) {
+      await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
+    }
     throw new Error(`kustomize build finished with ${errors.length} error(s)`)
   }
   core.info(`all of kustomize build successfully finished`)

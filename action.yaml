@@ -19,6 +19,10 @@ inputs:
     description: set true to write individual files
     required: true
     default: 'false'
+  error-comment:
+    description: post a comment on error
+    required: true
+    default: 'true'
   error-comment-header:
     description: header in a comment to post on error
     required: false
