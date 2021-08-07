@@ -9,7 +9,8 @@ const main = async (): Promise<void> => {
       baseDir: core.getInput('base-directory', { required: true }),
       maxProcess: parseInt(core.getInput('max-process', { required: true })),
       writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),
-      errorCommentHeader: core.getInput('error-comment-header', { required: true }),
+      errorCommentHeader: core.getInput('error-comment-header'),
+      errorCommentFooter: core.getInput('error-comment-footer'),
       token: core.getInput('token', { required: true }),
     })
   } catch (error) {
