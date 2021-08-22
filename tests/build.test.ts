@@ -6,8 +6,8 @@ jest.mock('@actions/core') // suppress logs
 
 jest.mock('@actions/exec')
 jest.mock('@actions/io')
-const execMock = exec.exec as jest.Mock<Promise<number>>
-const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>>
+const execMock = exec.exec as jest.Mock<Promise<number>, [string, string[]]>
+const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>, [string]>
 
 test('nothing', async () => {
   const errors = await kustomizeBuild([], { maxProcess: 1, writeIndividualFiles: false })
