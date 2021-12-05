@@ -94,17 +94,17 @@ This action writes the generated manifests with the extra files as follows:
 
 ## Inputs
 
-| Name | Required | Description
+| Name | Default | Description
 |------|----------|------------
-| `kustomization` | yes | glob patterns to `kustomization.yaml`
-| `extra-files` | no | glob patterns to extra files to copy
-| `base-directory` | no | base directory to compute a relative path to `kustomization.yaml` (default to workspace)
-| `max-process` | no | max number of kustomize processes (default to 5)
-| `write-individual-files` | no | set true to write individual files (default to `false`)
-| `error-comment` | no | post a comment on error (default to `true`)
-| `error-comment-header` | no | header in a comment to post on error
-| `error-comment-footer` | no | footer in a comment to post on error
-| `token` | no | GitHub token to post a comment on error
+| `kustomization` | (required) | glob patterns to `kustomization.yaml`
+| `extra-files` | - | glob patterns to extra files to copy
+| `base-directory` | (workspace) | base directory to compute a relative path to `kustomization.yaml`
+| `max-process` | 5 | max number of kustomize processes
+| `write-individual-files` | `false` | set true to write individual files
+| `error-comment` | `true` | post a comment on error
+| `error-comment-header` | - | header in a comment to post on error
+| `error-comment-footer` | - | footer in a comment to post on error
+| `token` | `github.token` | GitHub token to post a comment on error
 
 
 ## Outputs
