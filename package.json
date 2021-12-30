@@ -16,7 +16,7 @@
     "@actions/glob": "0.2.0"
   },
   "devDependencies": {
-    "@types/jest": "27.0.3",
+    "@types/jest": "27.4.0",
     "@types/node": "16.11.17",
     "@typescript-eslint/eslint-plugin": "5.8.1",
     "@typescript-eslint/parser": "5.8.1",
