@@ -1,13 +1,18 @@
 # kustomize-action [![ts](https://github.com/int128/kustomize-action/actions/workflows/ts.yaml/badge.svg)](https://github.com/int128/kustomize-action/actions/workflows/ts.yaml)
 
 This is an action to run `kustomize build` in parallel.
-`kustomize build` takes a long time if it loads an external resource such as HTTPS or Git.
-This action would reduce time by paralell build.
+
+
+## Problem to solve
+
+If `kustomization.yaml` depends on an external resource such as HTTPS, `kustomize build` takes a long time.
+For GitOps, a manifest repository contains many `kustomization.yaml` and it would be take a very long time to build all.
+This action builds them in parallel to reduce time.
 
 
 ## Getting Started
 
-To run this action:
+To build manifests, create a workflow as follows:
 
 ```yaml
 jobs:
@@ -22,14 +27,14 @@ jobs:
       - run: find ${{ steps.kustomize.outputs.directory }}
 ```
 
-If `kustomization` matches to the following files,
+If the following files are matched,
 
 ```
 overlays/development/kustomization.yaml
 overlays/production/kustomization.yaml
 ```
 
-this action writes the generated manifests to a temporary directory.
+this action writes the manifests to a temporary directory.
 You can get the paths from `outputs.files`, for example,
 
 ```
@@ -42,13 +47,6 @@ You can get the base directory from `outputs.directory`, for example,
 ```
 /tmp/kustomize-action-xyz
 ```
-
-
-### Post a comment on error
-
-If `kustomize build` returned an error, this action will post a comment to a pull request.
-
-![image](https://user-images.githubusercontent.com/321266/127739402-5f9c6388-bf84-48fe-b7a7-45aed0a7dbfe.png)
 
 
 ### Write individual files
@@ -90,6 +88,14 @@ This action writes the generated manifests with the extra files as follows:
 /tmp/kustomize-action-xyz/overlays/development/metadata.yaml
 /tmp/kustomize-action-xyz/overlays/production/generated.yaml
 ```
+
+
+### Post a comment on error
+
+If `kustomize build` returned an error, this action will post a comment to a pull request.
+You can turn off this feature by `error-comment` input.
+
+![image](https://user-images.githubusercontent.com/321266/127739402-5f9c6388-bf84-48fe-b7a7-45aed0a7dbfe.png)
 
 
 ## Inputs
