@@ -75,6 +75,9 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
     core.info(message)
     core.endGroup()
+
+    core.summary.addHeading(`:white_check_mark: ${task.kustomizationDir}`)
+    await core.summary.write()
     return
   }
 
@@ -82,5 +85,10 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
   core.info(message)
   core.endGroup()
+
+  core.summary.addHeading(`:x: ${task.kustomizationDir}`)
+  core.summary.addCodeBlock(`kustomize ${args.join(' ')}`)
+  core.summary.addCodeBlock(message)
+  await core.summary.write()
   return { code, message, kustomization: task }
 }
