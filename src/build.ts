@@ -79,7 +79,10 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   }
 
   core.startGroup(`\u001b[31mFAIL\u001b[0m ${task.kustomizationDir}`)
-  core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`)
+  core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`, {
+    file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
+    title: message,
+  })
   core.info(message)
   core.endGroup()
   return { code, message, kustomization: task }
