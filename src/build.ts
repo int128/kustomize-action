@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
-import * as exec from '@actions/exec'
 import * as io from '@actions/io'
 import * as path from 'path'
+import * as kustomize from './kustomize'
 
 export type Kustomization = {
   kustomizationDir: string
@@ -26,6 +26,9 @@ export const kustomizeBuild = async (
   if (option.maxProcess < 1) {
     throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
   }
+
+  // ensure kustomize is executable
+  await kustomize.run(['version'])
 
   const queue = kustomizations.concat()
   const workers: Promise<KustomizeError[]>[] = []
@@ -59,16 +62,7 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   } else {
     args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
   }
-  const lines: string[] = []
-  const code = await exec.exec('kustomize', args, {
-    silent: true,
-    ignoreReturnCode: true,
-    listeners: {
-      stdline: (line) => lines.push(line),
-      errline: (line) => lines.push(line),
-    },
-  })
-  const message = lines.join('\n')
+  const { code, message } = await kustomize.run(args, { silent: true })
 
   if (code === 0) {
     core.startGroup(task.kustomizationDir)
