@@ -7,6 +7,8 @@ const main = async (): Promise<void> => {
     extraFiles: core.getInput('extra-files'),
     baseDir: core.getInput('base-directory', { required: true }),
     maxProcess: parseInt(core.getInput('max-process', { required: true })),
+    retryMaxAttempts: parseInt(core.getInput('retry-max-attempts', { required: true })),
+    retryWaitMs: parseInt(core.getInput('retry-wait-ms', { required: true })),
     writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),
     errorComment: core.getBooleanInput('error-comment', { required: true }),
     errorCommentHeader: core.getInput('error-comment-header'),

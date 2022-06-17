@@ -105,12 +105,21 @@ You can turn off this feature by `error-comment` input.
 | `kustomization` | (required) | glob patterns to `kustomization.yaml`
 | `extra-files` | - | glob patterns to extra files to copy
 | `base-directory` | (workspace) | base directory to compute a relative path to `kustomization.yaml`
+| `retry-max-attempts` | 2 | max attempts of retry to run kustomize (0 = no retry)
+| `retry-wait-ms` | 2,000 (2s) | wait before retry kustomize in milliseconds
 | `max-process` | 5 | max number of kustomize processes
 | `write-individual-files` | `false` | set true to write individual files
 | `error-comment` | `true` | post a comment on error
 | `error-comment-header` | - | header in a comment to post on error
 | `error-comment-footer` | - | footer in a comment to post on error
 | `token` | `github.token` | GitHub token to post a comment on error
+
+### Retry options
+
+Eventually `kustomize` command fails due to a temporary error such as network error.
+This action retries if `kustomize` command returned non-zero exit status.
+
+You can turn off the retry by `retry-max-attempts` option.
 
 
 ## Outputs

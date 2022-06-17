@@ -11,6 +11,14 @@ inputs:
     description: base directory to compute a relative path of kustomization.yaml
     required: true
     default: ${{ github.workspace }}
+  retry-max-attempts:
+    description: max attempts of retry to run kustomize (0 = no retry)
+    required: true
+    default: '2'
+  retry-wait-ms:
+    description: wait before retry kustomize in milliseconds
+    required: true
+    default: '2000'
   max-process:
     description: max number of kustomize processes
     required: true
