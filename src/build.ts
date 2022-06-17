@@ -1,14 +1,14 @@
 import * as core from '@actions/core'
-import * as exec from '@actions/exec'
 import * as io from '@actions/io'
 import * as path from 'path'
+import * as kustomize from './kustomize'
 
 export type Kustomization = {
   kustomizationDir: string
   outputDir: string
 }
 
-export type KustomizeBuildOption = {
+export type KustomizeBuildOption = kustomize.RetryOptions & {
   maxProcess: number
   writeIndividualFiles: boolean
 }
@@ -59,16 +59,10 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   } else {
     args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
   }
-  const lines: string[] = []
-  const code = await exec.exec('kustomize', args, {
-    silent: true,
-    ignoreReturnCode: true,
-    listeners: {
-      stdline: (line) => lines.push(line),
-      errline: (line) => lines.push(line),
-    },
+  const { code, message } = await kustomize.run(args, {
+    ...option,
+    silent: true, // prevent logs in parallel
   })
-  const message = lines.join('\n')
 
   if (code === 0) {
     core.startGroup(task.kustomizationDir)

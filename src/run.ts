@@ -7,6 +7,7 @@ import { globKustomization } from './glob'
 import { kustomizeBuild } from './build'
 import { copyExtraFiles } from './copy'
 import { commentErrors } from './comment'
+import * as kustomize from './kustomize'
 
 type Inputs = {
   kustomization: string
@@ -23,13 +24,23 @@ type Inputs = {
 export const run = async (inputs: Inputs): Promise<void> => {
   const octokit = github.getOctokit(inputs.token)
 
+  // ensure kustomize is available
+  await kustomize.run(['version'], {
+    retryMaxAttempts: 3,
+    retryWaitMs: 3000,
+  })
+
   process.chdir(inputs.baseDir)
   const outputBaseDir = await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`)
   core.setOutput('directory', outputBaseDir)
   core.info(`writing to ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
-  const errors = await kustomizeBuild(kustomizations, inputs)
+  const errors = await kustomizeBuild(kustomizations, {
+    ...inputs,
+    retryMaxAttempts: 3,
+    retryWaitMs: 3000,
+  })
   if (errors.length > 0) {
     if (inputs.errorComment) {
       await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
