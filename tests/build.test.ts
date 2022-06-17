@@ -1,6 +1,7 @@
 import * as exec from '@actions/exec'
 import * as io from '@actions/io'
 import { Kustomization, kustomizeBuild } from '../src/build'
+import { RetryOptions } from '../src/kustomize'
 
 jest.mock('@actions/core') // suppress logs
 
@@ -9,8 +10,17 @@ jest.mock('@actions/io')
 const execMock = exec.exec as jest.Mock<Promise<number>, [string, string[]]>
 const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>, [string]>
 
+const noRetry: RetryOptions = {
+  retryMaxAttempts: 0,
+  retryWaitMs: 0,
+}
+
 test('nothing', async () => {
-  const errors = await kustomizeBuild([], { maxProcess: 1, writeIndividualFiles: false })
+  const errors = await kustomizeBuild([], {
+    maxProcess: 1,
+    writeIndividualFiles: false,
+    ...noRetry,
+  })
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).not.toHaveBeenCalled()
   expect(execMock).not.toHaveBeenCalled()
@@ -25,7 +35,7 @@ test('build a directory', async () => {
         outputDir: '/output/development',
       },
     ],
-    { maxProcess: 3, writeIndividualFiles: false }
+    { maxProcess: 3, writeIndividualFiles: false, ...noRetry }
   )
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -48,7 +58,7 @@ test('build a directory to individual files', async () => {
         outputDir: '/output/development',
       },
     ],
-    { maxProcess: 3, writeIndividualFiles: true }
+    { maxProcess: 3, writeIndividualFiles: true, ...noRetry }
   )
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -66,7 +76,7 @@ test('build a directory with an error', async () => {
         outputDir: '/output/development',
       },
     ],
-    { maxProcess: 3, writeIndividualFiles: false }
+    { maxProcess: 3, writeIndividualFiles: false, ...noRetry }
   )
   expect(errors.length).toBe(1)
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -96,7 +106,11 @@ test.each`
         outputDir: `/output/fixture${i}`,
       })
     }
-    const errors = await kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })
+    const errors = await kustomizeBuild(kustomizations, {
+      maxProcess,
+      writeIndividualFiles: false,
+      ...noRetry,
+    })
 
     expect(errors).toStrictEqual([])
     expect(execMock).toHaveBeenCalledTimes(overlays)
@@ -136,7 +150,11 @@ test.each`
         outputDir: `/output/fixture${i}`,
       })
     }
-    const errors = await kustomizeBuild(kustomizations, { maxProcess, writeIndividualFiles: false })
+    const errors = await kustomizeBuild(kustomizations, {
+      maxProcess,
+      writeIndividualFiles: false,
+      ...noRetry,
+    })
 
     expect(errors.length).toBe(1)
     expect(execMock).toHaveBeenCalledTimes(overlays)

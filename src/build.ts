@@ -8,7 +8,7 @@ export type Kustomization = {
   outputDir: string
 }
 
-export type KustomizeBuildOption = {
+export type KustomizeBuildOption = kustomize.RetryOptions & {
   maxProcess: number
   writeIndividualFiles: boolean
 }
@@ -26,9 +26,6 @@ export const kustomizeBuild = async (
   if (option.maxProcess < 1) {
     throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
   }
-
-  // ensure kustomize is executable
-  await kustomize.run(['version'])
 
   const queue = kustomizations.concat()
   const workers: Promise<KustomizeError[]>[] = []
@@ -62,7 +59,10 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   } else {
     args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
   }
-  const { code, message } = await kustomize.run(args, { silent: true })
+  const { code, message } = await kustomize.run(args, {
+    ...option,
+    silent: true, // prevent logs in parallel
+  })
 
   if (code === 0) {
     core.startGroup(task.kustomizationDir)
