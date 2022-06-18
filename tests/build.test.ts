@@ -7,7 +7,7 @@ jest.mock('@actions/core') // suppress logs
 
 jest.mock('@actions/exec')
 jest.mock('@actions/io')
-const execMock = exec.exec as jest.Mock<Promise<number>, [string, string[]]>
+const execMock = exec.getExecOutput as jest.Mock<Promise<exec.ExecOutput>, [string, string[]]>
 const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>, [string]>
 
 const noRetry: RetryOptions = {
@@ -27,7 +27,7 @@ test('nothing', async () => {
 })
 
 test('build a directory', async () => {
-  execMock.mockResolvedValue(0)
+  execMock.mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
   const errors = await kustomizeBuild(
     [
       {
@@ -50,7 +50,7 @@ test('build a directory', async () => {
 })
 
 test('build a directory to individual files', async () => {
-  execMock.mockResolvedValue(0)
+  execMock.mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
   const errors = await kustomizeBuild(
     [
       {
@@ -68,7 +68,7 @@ test('build a directory to individual files', async () => {
 })
 
 test('build a directory with an error', async () => {
-  execMock.mockResolvedValue(1)
+  execMock.mockResolvedValue({ exitCode: 1, stdout: '', stderr: 'error' })
   const errors = await kustomizeBuild(
     [
       {
@@ -97,7 +97,7 @@ test.each`
 `(
   'build $overlays directories using $maxProcess process',
   async ({ overlays, maxProcess }: { overlays: number; maxProcess: number }) => {
-    execMock.mockResolvedValue(0)
+    execMock.mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
 
     const kustomizations: Kustomization[] = []
     for (let i = 0; i < overlays; i++) {
@@ -140,7 +140,7 @@ test.each`
   'build $overlays directories using $maxProcess process with error $exitCodes',
   async ({ overlays, maxProcess, exitCodes }: { overlays: number; maxProcess: number; exitCodes: number[] }) => {
     for (const exitCode of exitCodes) {
-      execMock.mockResolvedValueOnce(exitCode)
+      execMock.mockResolvedValueOnce({ exitCode, stdout: '', stderr: '' })
     }
 
     const kustomizations: Kustomization[] = []
