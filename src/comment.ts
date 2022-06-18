@@ -31,8 +31,12 @@ const errorTemplate = (e: KustomizeError): string => {
   const relativeDir = path.relative('.', e.kustomization.kustomizationDir)
   return `
 ### ${relativeDir}
-\`\`\`
-${e.stderr.trim()}
-\`\`\`
+[kustomization.yaml](${kustomizationUrl(relativeDir)}) is invalid:
+<blockquote>${e.stderr.trim()}</blockquote>
 `
+}
+
+const kustomizationUrl = (directory: string) => {
+  const { serverUrl, repo, sha } = github.context
+  return `${serverUrl}/${repo.owner}/${repo.repo}/blob/${sha}/${directory}/kustomization.yaml`
 }
