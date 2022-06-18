@@ -15,8 +15,7 @@ export type KustomizeBuildOption = kustomize.RetryOptions & {
 
 export type KustomizeError = {
   kustomization: Kustomization
-  code: number
-  message: string
+  stderr: string
 }
 
 export const kustomizeBuild = async (
@@ -80,8 +79,7 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   core.info(output.stderr)
   core.endGroup()
   return {
-    code: output.exitCode,
-    message: output.stderr,
+    stderr: output.stderr,
     kustomization: task,
   }
 }

@@ -32,7 +32,7 @@ const errorTemplate = (e: KustomizeError): string => {
   return `
 ### ${relativeDir}
 \`\`\`
-${e.message}
+${e.stderr.trim()}
 \`\`\`
 `
 }
