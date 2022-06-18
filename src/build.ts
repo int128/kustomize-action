@@ -15,8 +15,7 @@ export type KustomizeBuildOption = kustomize.RetryOptions & {
 
 export type KustomizeError = {
   kustomization: Kustomization
-  code: number
-  message: string
+  stderr: string
 }
 
 export const kustomizeBuild = async (
@@ -50,6 +49,12 @@ const worker = async (queue: Kustomization[], option: KustomizeBuildOption): Pro
   }
 }
 
+const ansi = {
+  reset: '\u001b[0m',
+  red: '\u001b[31m',
+  blue: '\u001b[34m',
+}
+
 const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<KustomizeError | void> => {
   await io.mkdirP(task.outputDir)
 
@@ -59,25 +64,38 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   } else {
     args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
   }
-  const { code, message } = await kustomize.run(args, {
+  const output = await kustomize.run(args, {
     ...option,
     silent: true, // prevent logs in parallel
   })
 
-  if (code === 0) {
+  if (output.exitCode === 0) {
     core.startGroup(task.kustomizationDir)
-    core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-    core.info(message)
+    core.info(`${ansi.blue}kustomize ${args.join(' ')}`)
+    if (output.stdout) {
+      core.info(output.stdout)
+    }
+    if (output.stderr) {
+      core.info(output.stderr)
+    }
     core.endGroup()
     return
   }
 
-  core.startGroup(`\u001b[31mFAIL\u001b[0m ${task.kustomizationDir}`)
-  core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`, {
-    file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
-    title: message,
-  })
-  core.info(message)
+  core.startGroup(`${ansi.red}FAIL${ansi.reset} ${task.kustomizationDir}`)
+  core.info(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`)
+  if (output.stdout) {
+    core.info(output.stdout)
+  }
+  if (output.stderr) {
+    core.error(output.stderr, {
+      file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
+      title: `kustomize build (exit ${output.exitCode})`,
+    })
+  }
   core.endGroup()
-  return { code, message, kustomization: task }
+  return {
+    stderr: output.stderr,
+    kustomization: task,
+  }
 }
