@@ -49,6 +49,12 @@ const worker = async (queue: Kustomization[], option: KustomizeBuildOption): Pro
   }
 }
 
+const ansi = {
+  reset: '\u001b[0m',
+  red: '\u001b[31m',
+  blue: '\u001b[34m',
+}
+
 const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<KustomizeError | void> => {
   await io.mkdirP(task.outputDir)
 
@@ -65,18 +71,28 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
 
   if (output.exitCode === 0) {
     core.startGroup(task.kustomizationDir)
-    core.info(`kustomize ${args.join(' ')} finished with exit code ${output.exitCode}`)
-    core.info(output.stderr)
+    core.info(`${ansi.blue}kustomize ${args.join(' ')}`)
+    if (output.stdout) {
+      core.info(output.stdout)
+    }
+    if (output.stderr) {
+      core.info(output.stderr)
+    }
     core.endGroup()
     return
   }
 
-  core.startGroup(`\u001b[31mFAIL\u001b[0m ${task.kustomizationDir}`)
-  core.error(`kustomize ${args.join(' ')} finished with exit code ${output.exitCode}`, {
+  core.startGroup(`${ansi.red}FAIL${ansi.reset} ${task.kustomizationDir}`)
+  core.error(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`, {
     file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
     title: output.stderr,
   })
-  core.info(output.stderr)
+  if (output.stdout) {
+    core.info(output.stdout)
+  }
+  if (output.stderr) {
+    core.info(output.stderr)
+  }
   core.endGroup()
   return {
     stderr: output.stderr,
