@@ -59,25 +59,29 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   } else {
     args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
   }
-  const { code, message } = await kustomize.run(args, {
+  const output = await kustomize.run(args, {
     ...option,
     silent: true, // prevent logs in parallel
   })
 
-  if (code === 0) {
+  if (output.exitCode === 0) {
     core.startGroup(task.kustomizationDir)
-    core.info(`kustomize ${args.join(' ')} finished with exit code ${code}`)
-    core.info(message)
+    core.info(`kustomize ${args.join(' ')} finished with exit code ${output.exitCode}`)
+    core.info(output.stderr)
     core.endGroup()
     return
   }
 
   core.startGroup(`\u001b[31mFAIL\u001b[0m ${task.kustomizationDir}`)
-  core.error(`kustomize ${args.join(' ')} finished with exit code ${code}`, {
+  core.error(`kustomize ${args.join(' ')} finished with exit code ${output.exitCode}`, {
     file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
-    title: message,
+    title: output.stderr,
   })
-  core.info(message)
+  core.info(output.stderr)
   core.endGroup()
-  return { code, message, kustomization: task }
+  return {
+    code: output.exitCode,
+    message: output.stderr,
+    kustomization: task,
+  }
 }

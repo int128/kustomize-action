@@ -8,33 +8,20 @@ export type RetryOptions = {
   retryMaxAttempts: number
 }
 
-type Result = {
-  code: number
-  message: string
-}
-
-export const run = async (args: string[], options: Options): Promise<Result> => {
+export const run = async (args: string[], options: Options): Promise<exec.ExecOutput> => {
   for (let i = 0; i < options.retryMaxAttempts; i++) {
-    const output = await runInternal(args, options)
-    if (output.code === 0) {
+    const output = await exec.getExecOutput('kustomize', args, {
+      ...options,
+      ignoreReturnCode: true,
+    })
+    if (output.exitCode === 0) {
       return output
     }
-    core.warning(`kustomize returned exit code ${output.code}, retrying after ${options.retryWaitMs / 1000}s`)
+    core.warning(`kustomize returned exit code ${output.exitCode}, retrying after ${options.retryWaitMs / 1000}s`)
     await new Promise((resolve) => setTimeout(resolve, options.retryWaitMs))
   }
-  return await runInternal(args, options)
-}
-
-const runInternal = async (args: string[], options: exec.ExecOptions): Promise<Result> => {
-  const lines: string[] = []
-  const code = await exec.exec('kustomize', args, {
+  return await exec.getExecOutput('kustomize', args, {
     ...options,
     ignoreReturnCode: true,
-    listeners: {
-      stdline: (line) => lines.push(line),
-      errline: (line) => lines.push(line),
-    },
   })
-  const message = lines.join('\n')
-  return { code, message }
 }
