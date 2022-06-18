@@ -83,15 +83,15 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   }
 
   core.startGroup(`${ansi.red}FAIL${ansi.reset} ${task.kustomizationDir}`)
-  core.error(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`, {
-    file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
-    title: output.stderr,
-  })
+  core.info(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`)
   if (output.stdout) {
     core.info(output.stdout)
   }
   if (output.stderr) {
-    core.info(output.stderr)
+    core.error(output.stderr, {
+      file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
+      title: `kustomize build (exit ${output.exitCode})`,
+    })
   }
   core.endGroup()
   return {
