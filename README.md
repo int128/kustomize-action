@@ -49,6 +49,14 @@ You can get the base directory from `outputs.directory`, for example,
 ```
 
 
+### Post a comment on error
+
+If `kustomize build` returned an error, this action will post a comment to a pull request.
+You can turn off this feature by `error-comment` input.
+
+<img width="920" alt="image" src="https://user-images.githubusercontent.com/321266/174432028-24a3cc12-e3b0-45a6-aa5a-8137eb8237fe.png">
+
+
 ### Write individual files
 
 You can set `write-individual-files` to write individual files (see [kustomize#960](https://github.com/kubernetes-sigs/kustomize/pull/960)).
@@ -88,14 +96,6 @@ This action writes the generated manifests with the extra files as follows:
 /tmp/kustomize-action-xyz/overlays/development/metadata.yaml
 /tmp/kustomize-action-xyz/overlays/production/generated.yaml
 ```
-
-
-### Post a comment on error
-
-If `kustomize build` returned an error, this action will post a comment to a pull request.
-You can turn off this feature by `error-comment` input.
-
-![image](https://user-images.githubusercontent.com/321266/127739402-5f9c6388-bf84-48fe-b7a7-45aed0a7dbfe.png)
 
 
 ## Inputs
