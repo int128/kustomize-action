@@ -98,6 +98,12 @@ This action writes the generated manifests with the extra files as follows:
 ```
 
 
+## Diff between head and base ref of pull request
+
+When you open or update a pull request, you can see the diff of generated manifests between head and base ref.
+See [kustomize-diff-action](diff/) for details.
+
+
 ## Inputs
 
 | Name | Default | Description
