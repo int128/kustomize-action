@@ -1,0 +1,50 @@
+name: kustomize-diff-action
+description: run kustomize build and diff between head and base ref
+
+inputs:
+  kustomization:
+    description: glob patterns to kustomization.yaml
+    required: true
+  write-individual-files:
+    description: set true to write individual files (optional)
+  token:
+    description: GitHub token (optional)
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.base_ref }}
+        path: _base_ref
+
+    - uses: int128/hide-comment-action@v1
+      with:
+        token: ${{ inputs.token }}
+        ends-with: |
+          <!-- kustomize-action -->
+          <!-- diff-action -->
+
+    - uses: int128/kustomize-action@v1
+      id: kustomize-head
+      with:
+        token: ${{ inputs.token }}
+        write-individual-files: ${{ inputs.write-individual-files }}
+        kustomization: ${{ inputs.kustomization }}
+
+    - uses: int128/kustomize-action@v1
+      id: kustomize-base
+      continue-on-error: true # ignore if base branch is broken
+      with:
+        token: ${{ inputs.token }}
+        base-directory: _base_ref
+        write-individual-files: ${{ inputs.write-individual-files }}
+        kustomization: ${{ inputs.kustomization }}
+
+    - uses: int128/diff-action@v1
+      with:
+        token: ${{ inputs.token }}
+        base: ${{ steps.kustomize-base.outputs.directory }}
+        head: ${{ steps.kustomize-head.outputs.directory }}
