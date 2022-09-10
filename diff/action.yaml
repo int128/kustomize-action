@@ -8,7 +8,9 @@ inputs:
   write-individual-files:
     description: set true to write individual files (optional)
   token:
-    description: GitHub token to post a comment on error (optional)
+    description: GitHub token (optional)
+    required: true
+    default: ${{ github.token }}
 
 runs:
   using: composite
