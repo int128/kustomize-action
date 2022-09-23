@@ -6,7 +6,7 @@ import { promises as fs } from 'fs'
 import { globKustomization } from './glob'
 import { kustomizeBuild } from './build'
 import { copyExtraFiles } from './copy'
-import { commentErrors } from './comment'
+import { commentErrors, summaryErrors } from './comment'
 import * as kustomize from './kustomize'
 
 type Inputs = {
@@ -35,6 +35,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
   const errors = await kustomizeBuild(kustomizations, inputs)
   if (errors.length > 0) {
+    await summaryErrors(errors)
     if (inputs.errorComment) {
       await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
     }

@@ -17,7 +17,7 @@ export const run = async (args: string[], options: Options): Promise<exec.ExecOu
     if (output.exitCode === 0) {
       return output
     }
-    core.warning(`kustomize returned exit code ${output.exitCode}, retrying after ${options.retryWaitMs / 1000}s`)
+    core.info(`kustomize returned exit code ${output.exitCode}, retrying after ${options.retryWaitMs / 1000}s`)
     await new Promise((resolve) => setTimeout(resolve, options.retryWaitMs))
   }
   return await exec.getExecOutput('kustomize', args, {

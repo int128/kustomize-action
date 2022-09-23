@@ -49,10 +49,16 @@ You can get the base directory from `outputs.directory`, for example,
 ```
 
 
-### Post a comment on error
+### Errors
 
-If `kustomize build` returned an error, this action will post a comment to a pull request.
-You can turn off this feature by `error-comment` input.
+If `kustomize build` returned an error, 
+you can see it from GitHub Actions summary page or pull request review comment.
+
+<img width="860" alt="image" src="https://user-images.githubusercontent.com/321266/191903175-24c69251-0ef9-4515-8a24-91c9c3c5e598.png">
+
+<img width="860" alt="image" src="https://user-images.githubusercontent.com/321266/191903273-db04a861-b9ff-4157-8e15-ba169e33e09b.png">
+
+As well as you can set `error-comment` input to post a comment to a pull request.
 
 <img width="920" alt="image" src="https://user-images.githubusercontent.com/321266/174432028-24a3cc12-e3b0-45a6-aa5a-8137eb8237fe.png">
 
@@ -115,7 +121,7 @@ See [kustomize-diff-action](diff/) for details.
 | `retry-wait-ms` | 2,000 (2s) | wait before retry kustomize in milliseconds
 | `max-process` | 5 | max number of kustomize processes
 | `write-individual-files` | `false` | set true to write individual files
-| `error-comment` | `true` | post a comment on error
+| `error-comment` | `false` | post a comment on error
 | `error-comment-header` | - | header in a comment to post on error
 | `error-comment-footer` | - | footer in a comment to post on error
 | `token` | `github.token` | GitHub token to post a comment on error
