@@ -82,14 +82,15 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     return
   }
 
-  core.info(`${ansi.red}FAIL${ansi.reset} ${task.kustomizationDir}`)
+  const relativeFile = path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml')
+  core.error(`${ansi.red}FAIL${ansi.reset} ${relativeFile}`)
   core.info(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`)
   if (output.stdout) {
     core.info(output.stdout)
   }
   if (output.stderr) {
     core.error(output.stderr, {
-      file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
+      file: relativeFile,
       title: `kustomize build error (exit ${output.exitCode})`,
     })
   }
