@@ -82,7 +82,7 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     return
   }
 
-  core.startGroup(`${ansi.red}FAIL${ansi.reset} ${task.kustomizationDir}`)
+  core.info(`${ansi.red}FAIL${ansi.reset} ${task.kustomizationDir}`)
   core.info(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`)
   if (output.stdout) {
     core.info(output.stdout)
@@ -93,7 +93,6 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
       title: `kustomize build error (exit ${output.exitCode})`,
     })
   }
-  core.endGroup()
   return {
     stderr: output.stderr,
     kustomization: task,
