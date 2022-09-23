@@ -90,7 +90,7 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
   if (output.stderr) {
     core.error(output.stderr, {
       file: path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml'),
-      title: `kustomize build (exit ${output.exitCode})`,
+      title: `kustomize build error (exit ${output.exitCode})`,
     })
   }
   core.endGroup()

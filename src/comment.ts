@@ -27,6 +27,12 @@ export const commentErrors = async (octokit: Octokit, errors: KustomizeError[], 
   core.info(`created a comment as ${data.html_url}`)
 }
 
+export const summaryErrors = async (errors: KustomizeError[]) => {
+  core.summary.addRaw(`kustomize build finished with ${errors.length} error(s)`)
+  core.summary.addRaw(errors.map(errorTemplate).join('\n'))
+  await core.summary.write()
+}
+
 const errorTemplate = (e: KustomizeError): string => {
   const relativeDir = path.relative('.', e.kustomization.kustomizationDir)
   return `
