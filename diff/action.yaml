@@ -42,6 +42,7 @@ runs:
         base-directory: _base_ref
         write-individual-files: ${{ inputs.write-individual-files }}
         kustomization: ${{ inputs.kustomization }}
+        ignore-kustomize-error: true
 
     - uses: int128/diff-action@v1
       with:

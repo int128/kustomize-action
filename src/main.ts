@@ -10,6 +10,7 @@ const main = async (): Promise<void> => {
     retryMaxAttempts: parseInt(core.getInput('retry-max-attempts', { required: true })),
     retryWaitMs: parseInt(core.getInput('retry-wait-ms', { required: true })),
     writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),
+    ignoreKustomizeError: core.getBooleanInput('ignore-kustomize-error'),
     errorComment: core.getBooleanInput('error-comment', { required: true }),
     errorCommentHeader: core.getInput('error-comment-header'),
     errorCommentFooter: core.getInput('error-comment-footer'),

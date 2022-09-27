@@ -11,6 +11,7 @@ export type Kustomization = {
 export type KustomizeBuildOption = kustomize.RetryOptions & {
   maxProcess: number
   writeIndividualFiles: boolean
+  showErrorAnnotation: boolean
 }
 
 export type KustomizeError = {
@@ -89,10 +90,14 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     core.info(output.stdout)
   }
   if (output.stderr) {
-    core.error(output.stderr, {
-      file: relativeFile,
-      title: `kustomize build error (exit ${output.exitCode})`,
-    })
+    if (option.showErrorAnnotation) {
+      core.error(output.stderr, {
+        file: relativeFile,
+        title: `kustomize build error (exit ${output.exitCode})`,
+      })
+    } else {
+      core.info(output.stderr)
+    }
   }
   return {
     stderr: output.stderr,
