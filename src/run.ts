@@ -15,6 +15,7 @@ type Inputs = {
   baseDir: string
   maxProcess: number
   writeIndividualFiles: boolean
+  ignoreKustomizeError: boolean
   errorComment: boolean
   errorCommentHeader: string
   errorCommentFooter: string
@@ -33,15 +34,22 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.info(`writing to ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
-  const errors = await kustomizeBuild(kustomizations, inputs)
-  if (errors.length > 0) {
-    await summaryErrors(errors)
-    if (inputs.errorComment) {
-      await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
+  const errors = await kustomizeBuild(kustomizations, {
+    ...inputs,
+    showErrorAnnotation: !inputs.ignoreKustomizeError,
+  })
+  if (inputs.ignoreKustomizeError) {
+    core.info(`kustomize finished with ${errors.length} error(s)`)
+  } else {
+    if (errors.length > 0) {
+      await summaryErrors(errors)
+      if (inputs.errorComment) {
+        await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
+      }
+      throw new Error(`kustomize build finished with ${errors.length} error(s)`)
     }
-    throw new Error(`kustomize build finished with ${errors.length} error(s)`)
+    core.info(`all of kustomize build successfully finished`)
   }
-  core.info(`all of kustomize build successfully finished`)
 
   await copyExtraFiles(inputs.extraFiles, outputBaseDir)
 

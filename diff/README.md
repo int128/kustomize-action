@@ -29,3 +29,10 @@ jobs:
           kustomization: |
             config/default/kustomization.yaml
 ```
+
+## How it works
+
+1. It runs kustomize build against the head branch.
+1. It runs kustomize build against the base branch.
+   It ignores any kustomize errors on the base branch.
+1. It shows the diff between head and base branch.

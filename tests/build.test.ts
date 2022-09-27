@@ -19,6 +19,7 @@ test('nothing', async () => {
   const errors = await kustomizeBuild([], {
     maxProcess: 1,
     writeIndividualFiles: false,
+    showErrorAnnotation: true,
     ...noRetry,
   })
   expect(errors).toStrictEqual([])
@@ -35,7 +36,12 @@ test('build a directory', async () => {
         outputDir: '/output/development',
       },
     ],
-    { maxProcess: 3, writeIndividualFiles: false, ...noRetry }
+    {
+      maxProcess: 3,
+      writeIndividualFiles: false,
+      showErrorAnnotation: true,
+      ...noRetry,
+    }
   )
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -58,7 +64,12 @@ test('build a directory to individual files', async () => {
         outputDir: '/output/development',
       },
     ],
-    { maxProcess: 3, writeIndividualFiles: true, ...noRetry }
+    {
+      maxProcess: 3,
+      writeIndividualFiles: true,
+      showErrorAnnotation: true,
+      ...noRetry,
+    }
   )
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -76,7 +87,12 @@ test('build a directory with an error', async () => {
         outputDir: '/output/development',
       },
     ],
-    { maxProcess: 3, writeIndividualFiles: false, ...noRetry }
+    {
+      maxProcess: 3,
+      writeIndividualFiles: false,
+      showErrorAnnotation: true,
+      ...noRetry,
+    }
   )
   expect(errors.length).toBe(1)
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -109,6 +125,7 @@ test.each`
     const errors = await kustomizeBuild(kustomizations, {
       maxProcess,
       writeIndividualFiles: false,
+      showErrorAnnotation: true,
       ...noRetry,
     })
 
@@ -153,6 +170,7 @@ test.each`
     const errors = await kustomizeBuild(kustomizations, {
       maxProcess,
       writeIndividualFiles: false,
+      showErrorAnnotation: true,
       ...noRetry,
     })
 

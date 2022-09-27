@@ -27,6 +27,10 @@ inputs:
     description: set true to write individual files
     required: true
     default: 'false'
+  ignore-kustomize-error:
+    description: set true to ignore kustomize errors
+    required: true
+    default: 'false'
   error-comment:
     description: post a comment on error
     required: true
