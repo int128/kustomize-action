@@ -63,6 +63,11 @@ As well as you can set `error-comment` input to post a comment to a pull request
 <img width="920" alt="image" src="https://user-images.githubusercontent.com/321266/174432028-24a3cc12-e3b0-45a6-aa5a-8137eb8237fe.png">
 
 You can set `ignore-kustomize-error` input to suppress kustomize errors.
+If it is set to true,
+
+- It exits successfully even if kustomize exited with non-zero code
+- It does not add a pull request review comment
+- It dows not add an error annotation
 
 ### Write individual files
 
