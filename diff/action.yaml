@@ -36,7 +36,6 @@ runs:
 
     - uses: int128/kustomize-action@v1
       id: kustomize-base
-      continue-on-error: true # ignore if base branch is broken
       with:
         token: ${{ inputs.token }}
         base-directory: _base_ref
