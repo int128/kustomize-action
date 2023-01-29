@@ -14,20 +14,12 @@ on:
         description: GitHub token (optional)
         type: string
         default: ${{ github.token }}
-  pull_request:
-    paths:
-      - .github/workflows/diff.yaml
 
 jobs:
   diff:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.base_ref }}
-          path: _base_ref
-
       - uses: int128/hide-comment-action@v1
         with:
           token: ${{ inputs.token }}
@@ -35,18 +27,27 @@ jobs:
             <!-- kustomize-action -->
             <!-- diff-action -->
 
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          path: head
       - uses: int128/kustomize-action@v1
         id: kustomize-head
         with:
           token: ${{ inputs.token }}
+          base-directory: head
           write-individual-files: ${{ inputs.write-individual-files }}
           kustomization: ${{ inputs.kustomization }}
 
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
       - uses: int128/kustomize-action@v1
         id: kustomize-base
         with:
           token: ${{ inputs.token }}
-          base-directory: _base_ref
+          base-directory: base
           write-individual-files: ${{ inputs.write-individual-files }}
           kustomization: ${{ inputs.kustomization }}
           ignore-kustomize-error: true
