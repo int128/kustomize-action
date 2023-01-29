@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: int128/hide-comment-action@v1
         with:
-          token: ${{ inputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ inputs.token || github.token }}
           ends-with: |
             <!-- kustomize-action -->
             <!-- diff-action -->
@@ -33,7 +33,7 @@ jobs:
       - uses: int128/kustomize-action@v1
         id: kustomize-head
         with:
-          token: ${{ inputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ inputs.token || github.token }}
           base-directory: head
           write-individual-files: ${{ inputs.write-individual-files }}
           kustomization: ${{ inputs.kustomization }}
@@ -45,7 +45,7 @@ jobs:
       - uses: int128/kustomize-action@v1
         id: kustomize-base
         with:
-          token: ${{ inputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ inputs.token || github.token }}
           base-directory: base
           write-individual-files: ${{ inputs.write-individual-files }}
           kustomization: ${{ inputs.kustomization }}
@@ -53,6 +53,6 @@ jobs:
 
       - uses: int128/diff-action@v1
         with:
-          token: ${{ inputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ inputs.token || github.token }}
           base: ${{ steps.kustomize-base.outputs.directory }}
           head: ${{ steps.kustomize-head.outputs.directory }}
