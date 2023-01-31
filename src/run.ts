@@ -23,12 +23,10 @@ type Inputs = {
 } & kustomize.RetryOptions
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const octokit = github.getOctokit(inputs.token)
-
   // ensure kustomize is available
+  process.chdir(inputs.baseDir)
   await kustomize.run(['version'], inputs)
 
-  process.chdir(inputs.baseDir)
   const outputBaseDir = await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`)
   core.setOutput('directory', outputBaseDir)
   core.info(`writing to ${outputBaseDir}`)
@@ -44,6 +42,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     if (errors.length > 0) {
       await summaryErrors(errors)
       if (inputs.errorComment) {
+        const octokit = github.getOctokit(inputs.token)
         await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
       }
       throw new Error(`kustomize build finished with ${errors.length} error(s)`)
