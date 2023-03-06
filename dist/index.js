@@ -70,7 +70,7 @@ const build = async (task, option) => {
     await io.mkdirP(task.outputDir);
     let args;
     if (option.writeIndividualFiles) {
-        args = ['build', task.kustomizationDir, '-o', task.outputDir, '--load_restrictor', option.loadRestrictor];
+        args = ['build', task.kustomizationDir, '-o', task.outputDir, '--load-restrictor', option.loadRestrictor];
     }
     else {
         args = [
@@ -78,7 +78,7 @@ const build = async (task, option) => {
             task.kustomizationDir,
             '-o',
             path.join(task.outputDir, 'generated.yaml'),
-            '--load_restrictor',
+            '--load-restrictor',
             option.loadRestrictor,
         ];
     }
