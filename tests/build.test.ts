@@ -1,6 +1,9 @@
 import * as exec from '@actions/exec'
 import * as io from '@actions/io'
+
 import { Kustomization, kustomizeBuild } from '../src/build'
+
+import { LoadRestrictor } from '../src/run'
 import { RetryOptions } from '../src/kustomize'
 
 jest.mock('@actions/core') // suppress logs
@@ -20,6 +23,7 @@ test('nothing', async () => {
     maxProcess: 1,
     writeIndividualFiles: false,
     showErrorAnnotation: true,
+    loadRestrictor: LoadRestrictor.LoadRestrictionsRootOnly,
     ...noRetry,
   })
   expect(errors).toStrictEqual([])
@@ -40,6 +44,7 @@ test('build a directory', async () => {
       maxProcess: 3,
       writeIndividualFiles: false,
       showErrorAnnotation: true,
+      loadRestrictor: LoadRestrictor.LoadRestrictionsRootOnly,
       ...noRetry,
     }
   )
@@ -52,6 +57,8 @@ test('build a directory', async () => {
     '/fixtures/development',
     '-o',
     '/output/development/generated.yaml',
+    '--load_restrictor',
+    'LoadRestrictionsRootOnly',
   ])
 })
 
@@ -68,6 +75,7 @@ test('build a directory to individual files', async () => {
       maxProcess: 3,
       writeIndividualFiles: true,
       showErrorAnnotation: true,
+      loadRestrictor: LoadRestrictor.LoadRestrictionsRootOnly,
       ...noRetry,
     }
   )
@@ -75,7 +83,14 @@ test('build a directory to individual files', async () => {
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
   expect(execMock.mock.calls[0][0]).toBe('kustomize')
-  expect(execMock.mock.calls[0][1]).toStrictEqual(['build', '/fixtures/development', '-o', '/output/development'])
+  expect(execMock.mock.calls[0][1]).toStrictEqual([
+    'build',
+    '/fixtures/development',
+    '-o',
+    '/output/development',
+    '--load_restrictor',
+    'LoadRestrictionsRootOnly',
+  ])
 })
 
 test('build a directory with an error', async () => {
@@ -91,6 +106,7 @@ test('build a directory with an error', async () => {
       maxProcess: 3,
       writeIndividualFiles: false,
       showErrorAnnotation: true,
+      loadRestrictor: LoadRestrictor.LoadRestrictionsRootOnly,
       ...noRetry,
     }
   )
@@ -126,6 +142,7 @@ test.each`
       maxProcess,
       writeIndividualFiles: false,
       showErrorAnnotation: true,
+      loadRestrictor: LoadRestrictor.LoadRestrictionsRootOnly,
       ...noRetry,
     })
 
@@ -139,6 +156,8 @@ test.each`
         `/input/fixture${i}`,
         '-o',
         `/output/fixture${i}/generated.yaml`,
+        '--load_restrictor',
+        'LoadRestrictionsRootOnly',
       ])
     }
   }
@@ -171,6 +190,7 @@ test.each`
       maxProcess,
       writeIndividualFiles: false,
       showErrorAnnotation: true,
+      loadRestrictor: LoadRestrictor.LoadRestrictionsRootOnly,
       ...noRetry,
     })
 
@@ -184,7 +204,40 @@ test.each`
         `/input/fixture${i}`,
         '-o',
         `/output/fixture${i}/generated.yaml`,
+        '--load_restrictor',
+        'LoadRestrictionsRootOnly',
       ])
     }
   }
 )
+
+test('build correctly passes the load restrictor argument', async () => {
+  execMock.mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+  const errors = await kustomizeBuild(
+    [
+      {
+        kustomizationDir: '/fixtures/development',
+        outputDir: '/output/development',
+      },
+    ],
+    {
+      maxProcess: 3,
+      writeIndividualFiles: false,
+      showErrorAnnotation: true,
+      loadRestrictor: LoadRestrictor.LoadRestrictionsNone,
+      ...noRetry,
+    }
+  )
+  expect(errors).toStrictEqual([])
+  expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
+  expect(execMock).toHaveBeenCalledTimes(1)
+  expect(execMock.mock.calls[0][0]).toBe('kustomize')
+  expect(execMock.mock.calls[0][1]).toStrictEqual([
+    'build',
+    '/fixtures/development',
+    '-o',
+    '/output/development/generated.yaml',
+    '--load_restrictor',
+    'LoadRestrictionsNone',
+  ])
+})

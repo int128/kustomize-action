@@ -1,13 +1,20 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as glob from '@actions/glob'
+import * as kustomize from './kustomize'
 import * as os from 'os'
+
+import { commentErrors, summaryErrors } from './comment'
+
+import { copyExtraFiles } from './copy'
 import { promises as fs } from 'fs'
 import { globKustomization } from './glob'
 import { kustomizeBuild } from './build'
-import { copyExtraFiles } from './copy'
-import { commentErrors, summaryErrors } from './comment'
-import * as kustomize from './kustomize'
+
+export enum LoadRestrictor {
+  LoadRestrictionsNone = 'LoadRestrictionsNone',
+  LoadRestrictionsRootOnly = 'LoadRestrictionsRootOnly',
+}
 
 type Inputs = {
   kustomization: string
@@ -20,6 +27,7 @@ type Inputs = {
   errorCommentHeader: string
   errorCommentFooter: string
   token: string
+  loadRestrictor: LoadRestrictor
 } & kustomize.RetryOptions
 
 export const run = async (inputs: Inputs): Promise<void> => {

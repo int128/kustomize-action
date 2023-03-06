@@ -49,6 +49,10 @@ inputs:
     description: GitHub token to post a comment on error
     required: true
     default: ${{ github.token }}
+  loadRestrictor:
+    description: Sets the loadRestrictor for kustomize [LoadRestrictionsRootOnly, LoadRestrictionsNone]
+    required: false
+    default: LoadRestrictionsRootOnly
 outputs:
   directory:
     description: directory to results of kustomize build

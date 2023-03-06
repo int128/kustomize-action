@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
-import { run } from './run'
+
+import { LoadRestrictor, run } from './run'
 
 const main = async (): Promise<void> => {
   await run({
@@ -15,6 +16,12 @@ const main = async (): Promise<void> => {
     errorCommentHeader: core.getInput('error-comment-header'),
     errorCommentFooter: core.getInput('error-comment-footer'),
     token: core.getInput('token', { required: true }),
+    loadRestrictor:
+      LoadRestrictor[
+        (core.getInput('load-restrictor') !== ''
+          ? core.getInput('load-restrictor')
+          : 'LoadRestrictionsRootOnly') as keyof typeof LoadRestrictor
+      ],
   })
 }
 

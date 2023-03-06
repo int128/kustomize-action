@@ -132,6 +132,7 @@ See [kustomize-diff-action](diff/) for details.
 | `error-comment-header` | - | header in a comment to post on error
 | `error-comment-footer` | - | footer in a comment to post on error
 | `token` | `github.token` | GitHub token to post a comment on error
+| `load-restrictor` | `LoadRestrictionsRootOnly` | Configures the load restrictor argument for the  `kustomize` command
 
 ### Retry options
 
