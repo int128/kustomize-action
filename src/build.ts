@@ -1,7 +1,9 @@
 import * as core from '@actions/core'
 import * as io from '@actions/io'
-import * as path from 'path'
 import * as kustomize from './kustomize'
+import * as path from 'path'
+
+import { LoadRestrictor } from './run'
 
 export type Kustomization = {
   kustomizationDir: string
@@ -12,6 +14,7 @@ export type KustomizeBuildOption = kustomize.RetryOptions & {
   maxProcess: number
   writeIndividualFiles: boolean
   showErrorAnnotation: boolean
+  loadRestrictor: LoadRestrictor
 }
 
 export type KustomizeError = {
@@ -61,9 +64,16 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
 
   let args
   if (option.writeIndividualFiles) {
-    args = ['build', task.kustomizationDir, '-o', task.outputDir]
+    args = ['build', task.kustomizationDir, '-o', task.outputDir, '--load-restrictor', option.loadRestrictor]
   } else {
-    args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
+    args = [
+      'build',
+      task.kustomizationDir,
+      '-o',
+      path.join(task.outputDir, 'generated.yaml'),
+      '--load-restrictor',
+      option.loadRestrictor,
+    ]
   }
   const output = await kustomize.run(args, {
     ...option,
