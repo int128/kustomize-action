@@ -64,14 +64,14 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
 
   let args
   if (option.writeIndividualFiles) {
-    args = ['build', task.kustomizationDir, '-o', task.outputDir, '--load_restrictor', option.loadRestrictor]
+    args = ['build', task.kustomizationDir, '-o', task.outputDir, '--load-restrictor', option.loadRestrictor]
   } else {
     args = [
       'build',
       task.kustomizationDir,
       '-o',
       path.join(task.outputDir, 'generated.yaml'),
-      '--load_restrictor',
+      '--load-restrictor',
       option.loadRestrictor,
     ]
   }

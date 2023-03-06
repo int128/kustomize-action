@@ -57,7 +57,7 @@ test('build a directory', async () => {
     '/fixtures/development',
     '-o',
     '/output/development/generated.yaml',
-    '--load_restrictor',
+    '--load-restrictor',
     'LoadRestrictionsRootOnly',
   ])
 })
@@ -88,7 +88,7 @@ test('build a directory to individual files', async () => {
     '/fixtures/development',
     '-o',
     '/output/development',
-    '--load_restrictor',
+    '--load-restrictor',
     'LoadRestrictionsRootOnly',
   ])
 })
@@ -156,7 +156,7 @@ test.each`
         `/input/fixture${i}`,
         '-o',
         `/output/fixture${i}/generated.yaml`,
-        '--load_restrictor',
+        '--load-restrictor',
         'LoadRestrictionsRootOnly',
       ])
     }
@@ -204,7 +204,7 @@ test.each`
         `/input/fixture${i}`,
         '-o',
         `/output/fixture${i}/generated.yaml`,
-        '--load_restrictor',
+        '--load-restrictor',
         'LoadRestrictionsRootOnly',
       ])
     }
@@ -237,7 +237,7 @@ test('build correctly passes the load restrictor argument', async () => {
     '/fixtures/development',
     '-o',
     '/output/development/generated.yaml',
-    '--load_restrictor',
+    '--load-restrictor',
     'LoadRestrictionsNone',
   ])
 })
