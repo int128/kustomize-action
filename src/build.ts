@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as io from '@actions/io'
 import * as path from 'path'
 import * as kustomize from './kustomize'
+import * as executor from './executor'
 
 export type Kustomization = {
   kustomizationDir: string
@@ -26,28 +27,18 @@ export const kustomizeBuild = async (
   if (option.maxProcess < 1) {
     throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
   }
-
-  const queue = kustomizations.concat()
-  const workers: Promise<KustomizeError[]>[] = []
-  for (let index = 0; index < option.maxProcess; index++) {
-    workers.push(worker(queue, option))
+  const tasks = []
+  for (const kustomization of kustomizations) {
+    tasks.push(async () => await build(kustomization, option))
   }
-  const errorsOfWorkers = await Promise.all(workers)
-  const errors = ([] as KustomizeError[]).concat(...errorsOfWorkers)
-  return errors
-}
-
-const worker = async (queue: Kustomization[], option: KustomizeBuildOption): Promise<KustomizeError[]> => {
-  for (const errors: KustomizeError[] = []; ; ) {
-    const task = queue.shift()
-    if (task === undefined) {
-      return errors // end of tasks
-    }
-    const result = await build(task, option)
-    if (result !== undefined) {
+  const results = await executor.execute(tasks, option.maxProcess)
+  const errors = []
+  for (const result of results) {
+    if (result) {
       errors.push(result)
     }
   }
+  return errors
 }
 
 const ansi = {
