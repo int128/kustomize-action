@@ -1,16 +1,16 @@
 name: ts
 
 on:
-  push:
-    branches: [main]
+  pull_request:
     paths:
       - src/**
       - tests/**
       - '*.json'
       - action.yaml
       - .github/workflows/ts.yaml
-  pull_request:
-    branches: [main]
+  push:
+    branches:
+      - main
     paths:
       - src/**
       - tests/**
@@ -19,17 +19,16 @@ on:
       - .github/workflows/ts.yaml
 
 jobs:
-  ts:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
         with:
           node-version: 16
           cache: yarn
       - run: yarn
-      - run: yarn lint
-      - run: yarn format-check
       - run: yarn test
       - run: yarn build
       - run: yarn package
@@ -81,3 +80,20 @@ jobs:
         with:
           kustomization: tests/fixtures/invalid/kustomization.yaml
           ignore-kustomize-error: true
+
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn lint --fix
+      - run: yarn format
+      - uses: int128/update-generated-files-action@9cf17834a8b281b48b8523a3ba36d178ed71e0f4 # v2.38.0
