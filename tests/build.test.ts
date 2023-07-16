@@ -41,7 +41,7 @@ test('build a directory', async () => {
       writeIndividualFiles: false,
       showErrorAnnotation: true,
       ...noRetry,
-    }
+    },
   )
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -69,7 +69,7 @@ test('build a directory to individual files', async () => {
       writeIndividualFiles: true,
       showErrorAnnotation: true,
       ...noRetry,
-    }
+    },
   )
   expect(errors).toStrictEqual([])
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -92,7 +92,7 @@ test('build a directory with an error', async () => {
       writeIndividualFiles: false,
       showErrorAnnotation: true,
       ...noRetry,
-    }
+    },
   )
   expect(errors.length).toBe(1)
   expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
@@ -141,7 +141,7 @@ test.each`
         `/output/fixture${i}/generated.yaml`,
       ])
     }
-  }
+  },
 )
 
 test.each`
@@ -186,5 +186,5 @@ test.each`
         `/output/fixture${i}/generated.yaml`,
       ])
     }
-  }
+  },
 )

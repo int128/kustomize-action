@@ -15,6 +15,6 @@ test('run successfully', async () => {
   expect(mkdirPMock).toHaveBeenCalledWith(`/tmp/foo/fixtures/overlays/development`)
   expect(cpMock).toHaveBeenCalledWith(
     `${__dirname}/fixtures/overlays/development/metadata.yaml`,
-    `/tmp/foo/fixtures/overlays/development/metadata.yaml`
+    `/tmp/foo/fixtures/overlays/development/metadata.yaml`,
   )
 })
