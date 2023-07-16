@@ -15,26 +15,26 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
         ref: ${{ github.base_ref }}
         path: _base_ref
 
-    - uses: int128/hide-comment-action@v1.23.0
+    - uses: int128/hide-comment-action@5aa4ad6cf762098ebdc5d3c046e9e1fb35fe5ce8 # v1.23.0
       with:
         token: ${{ inputs.token }}
         ends-with: |
           <!-- kustomize-action -->
           <!-- diff-action -->
 
-    - uses: int128/kustomize-action@v1.27.0
+    - uses: int128/kustomize-action@77cb30ebfef484fd4f3bb2f06da6130477e7c3d6 # v1.27.0
       id: kustomize-head
       with:
         token: ${{ inputs.token }}
         write-individual-files: ${{ inputs.write-individual-files }}
         kustomization: ${{ inputs.kustomization }}
 
-    - uses: int128/kustomize-action@v1.27.0
+    - uses: int128/kustomize-action@77cb30ebfef484fd4f3bb2f06da6130477e7c3d6 # v1.27.0
       id: kustomize-base
       with:
         token: ${{ inputs.token }}
@@ -43,7 +43,7 @@ runs:
         kustomization: ${{ inputs.kustomization }}
         ignore-kustomize-error: true
 
-    - uses: int128/diff-action@v1.17.0
+    - uses: int128/diff-action@757ae2d0f4e2b66003f232f7ebd6ca998ff2b81b # v1.17.0
       with:
         token: ${{ inputs.token }}
         base: ${{ steps.kustomize-base.outputs.directory }}
