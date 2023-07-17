@@ -38,7 +38,7 @@ test('build a directory', async () => {
     {
       maxProcess: 3,
       writeIndividualFiles: false,
-        ...noRetry,
+      ...noRetry,
     },
   )
   expect(errors).toStrictEqual([])
@@ -65,7 +65,7 @@ test('build a directory to individual files', async () => {
     {
       maxProcess: 3,
       writeIndividualFiles: true,
-        ...noRetry,
+      ...noRetry,
     },
   )
   expect(errors).toStrictEqual([])
@@ -87,7 +87,7 @@ test('build a directory with an error', async () => {
     {
       maxProcess: 3,
       writeIndividualFiles: false,
-        ...noRetry,
+      ...noRetry,
     },
   )
   expect(errors.length).toBe(1)
@@ -121,7 +121,7 @@ test.each`
     const errors = await kustomizeBuild(kustomizations, {
       maxProcess,
       writeIndividualFiles: false,
-        ...noRetry,
+      ...noRetry,
     })
 
     expect(errors).toStrictEqual([])
@@ -165,7 +165,7 @@ test.each`
     const errors = await kustomizeBuild(kustomizations, {
       maxProcess,
       writeIndividualFiles: false,
-        ...noRetry,
+      ...noRetry,
     })
 
     expect(errors.length).toBe(1)

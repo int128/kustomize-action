@@ -21,7 +21,7 @@ export type KustomizeError = {
 
 export const kustomizeBuild = async (
   kustomizations: Kustomization[],
-  option: KustomizeBuildOption
+  option: KustomizeBuildOption,
 ): Promise<KustomizeError[]> => {
   if (option.maxProcess < 1) {
     throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
