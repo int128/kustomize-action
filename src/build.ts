@@ -10,6 +10,7 @@ export type Kustomization = {
 }
 
 export type KustomizeBuildOption = kustomize.RetryOptions & {
+  kustomizeBuildArgs: string[]
   maxProcess: number
   writeIndividualFiles: boolean
 }
@@ -49,17 +50,18 @@ const ansi = {
 const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<KustomizeError | void> => {
   await io.mkdirP(task.outputDir)
 
-  let args
+  const args = ['build', task.kustomizationDir]
   if (option.writeIndividualFiles) {
-    args = ['build', task.kustomizationDir, '-o', task.outputDir]
+    args.push('-o', task.outputDir)
   } else {
-    args = ['build', task.kustomizationDir, '-o', path.join(task.outputDir, 'generated.yaml')]
+    args.push('-o', path.join(task.outputDir, 'generated.yaml'))
   }
+  args.push(...option.kustomizeBuildArgs)
+
   const output = await kustomize.run(args, {
     ...option,
     silent: true, // prevent logs in parallel
   })
-
   if (output.exitCode === 0) {
     core.startGroup(task.kustomizationDir)
     core.info(`${ansi.blue}kustomize ${args.join(' ')}`)
