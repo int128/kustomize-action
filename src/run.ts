@@ -32,10 +32,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.info(`writing to ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
-  const errors = await kustomizeBuild(kustomizations, {
-    ...inputs,
-    showErrorAnnotation: !inputs.ignoreKustomizeError,
-  })
+  const errors = await kustomizeBuild(kustomizations, inputs)
   if (inputs.ignoreKustomizeError) {
     core.info(`kustomize finished with ${errors.length} error(s)`)
   } else {

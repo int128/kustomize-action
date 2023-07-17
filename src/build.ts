@@ -12,7 +12,6 @@ export type Kustomization = {
 export type KustomizeBuildOption = kustomize.RetryOptions & {
   maxProcess: number
   writeIndividualFiles: boolean
-  showErrorAnnotation: boolean
 }
 
 export type KustomizeError = {
@@ -74,21 +73,6 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     return
   }
 
-  const kustomizeError = {
-    stderr: output.stderr,
-    kustomization: task,
-  }
-  if (!option.showErrorAnnotation) {
-    core.info(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`)
-    if (output.stdout) {
-      core.info(output.stdout)
-    }
-    if (output.stderr) {
-      core.info(output.stderr)
-    }
-    return kustomizeError
-  }
-
   const relativeFile = path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml')
   core.error(`${ansi.red}FAIL${ansi.reset} ${relativeFile}`)
   core.info(`${ansi.blue}kustomize ${args.join(' ')}${ansi.reset} (exit ${output.exitCode})`)
@@ -101,5 +85,8 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
       title: `kustomize build error (exit ${output.exitCode})`,
     })
   }
-  return kustomizeError
+  return {
+    stderr: output.stderr,
+    kustomization: task,
+  }
 }
