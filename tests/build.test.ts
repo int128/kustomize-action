@@ -17,6 +17,7 @@ const noRetry: RetryOptions = {
 
 test('nothing', async () => {
   const errors = await kustomizeBuild([], {
+    kustomizeBuildArgs: [],
     maxProcess: 1,
     writeIndividualFiles: false,
     ...noRetry,
@@ -36,6 +37,7 @@ test('build a directory', async () => {
       },
     ],
     {
+      kustomizeBuildArgs: [],
       maxProcess: 3,
       writeIndividualFiles: false,
       ...noRetry,
@@ -63,6 +65,7 @@ test('build a directory to individual files', async () => {
       },
     ],
     {
+      kustomizeBuildArgs: [],
       maxProcess: 3,
       writeIndividualFiles: true,
       ...noRetry,
@@ -85,6 +88,7 @@ test('build a directory with an error', async () => {
       },
     ],
     {
+      kustomizeBuildArgs: [],
       maxProcess: 3,
       writeIndividualFiles: false,
       ...noRetry,
@@ -119,6 +123,7 @@ test.each`
       })
     }
     const errors = await kustomizeBuild(kustomizations, {
+      kustomizeBuildArgs: [],
       maxProcess,
       writeIndividualFiles: false,
       ...noRetry,
@@ -163,6 +168,7 @@ test.each`
       })
     }
     const errors = await kustomizeBuild(kustomizations, {
+      kustomizeBuildArgs: [],
       maxProcess,
       writeIndividualFiles: false,
       ...noRetry,
