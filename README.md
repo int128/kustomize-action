@@ -48,7 +48,6 @@ You can get the base directory from `outputs.directory`, for example,
 /tmp/kustomize-action-xyz
 ```
 
-
 ### Errors
 
 If `kustomize build` returned an error, 
@@ -89,7 +88,6 @@ This action writes the individual manifests as follows:
 /tmp/kustomize-action-xyz/overlays/production/v1_service_echoserver.yaml
 ```
 
-
 ### Copy extra files
 
 You can set `extra-files` to copy the extra files with the results of `kustomize build`.
@@ -109,6 +107,18 @@ This action writes the generated manifests with the extra files as follows:
 /tmp/kustomize-action-xyz/overlays/production/generated.yaml
 ```
 
+### Add extra args
+
+You can add extra args to `kustomize build` command.
+
+```yaml
+      - uses: int128/kustomize-action@v1
+        with:
+          kustomization: overlays/*/kustomization.yaml
+          kustomize-build-args: |
+            --load-restrictor=LoadRestrictionsNone
+```
+
 
 ## Diff between head and base ref of pull request
 
@@ -121,6 +131,7 @@ See [kustomize-diff-action](diff/) for details.
 | Name | Default | Description
 |------|----------|------------
 | `kustomization` | (required) | glob patterns to `kustomization.yaml`
+| `kustomize-build-args` | - | extra args to kustomize build command (multiline)
 | `extra-files` | - | glob patterns to extra files to copy
 | `base-directory` | (workspace) | base directory to compute a relative path to `kustomization.yaml`
 | `retry-max-attempts` | 2 | max attempts of retry to run kustomize (0 = no retry)
