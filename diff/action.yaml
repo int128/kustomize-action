@@ -27,14 +27,14 @@ runs:
           <!-- kustomize-action -->
           <!-- diff-action -->
 
-    - uses: int128/kustomize-action@11e00d4a81c255e7f487629254d87a8cd3a176ba # v1.52.0
+    - uses: int128/kustomize-action@3b314c3da2185014c3a01798c5e99ca2b794ef95 # v1.53.0
       id: kustomize-head
       with:
         token: ${{ inputs.token }}
         write-individual-files: ${{ inputs.write-individual-files }}
         kustomization: ${{ inputs.kustomization }}
 
-    - uses: int128/kustomize-action@11e00d4a81c255e7f487629254d87a8cd3a176ba # v1.52.0
+    - uses: int128/kustomize-action@3b314c3da2185014c3a01798c5e99ca2b794ef95 # v1.53.0
       id: kustomize-base
       with:
         token: ${{ inputs.token }}
