@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import * as io from '@actions/io'
 import * as path from 'path'
-import * as kustomize from './kustomize'
-import * as executor from './executor'
+import * as kustomize from './kustomize.js'
+import * as executor from './executor.js'
 
 export type Kustomization = {
   kustomizationDir: string
