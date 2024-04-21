@@ -1,5 +1,5 @@
 import * as io from '@actions/io'
-import { copyExtraFiles } from '../src/copy'
+import { copyExtraFiles } from '../src/copy.js'
 
 jest.mock('@actions/io')
 const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>>

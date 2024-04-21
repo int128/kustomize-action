@@ -1,7 +1,7 @@
 import * as glob from '@actions/glob'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { Kustomization } from './build'
+import { Kustomization } from './build.js'
 
 export const globKustomization = async (patterns: string, outputBaseDir: string): Promise<Kustomization[]> => {
   const cwd = process.cwd()

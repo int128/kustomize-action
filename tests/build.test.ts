@@ -1,7 +1,7 @@
 import * as exec from '@actions/exec'
 import * as io from '@actions/io'
-import { Kustomization, kustomizeBuild } from '../src/build'
-import { RetryOptions } from '../src/kustomize'
+import { Kustomization, kustomizeBuild } from '../src/build.js'
+import { RetryOptions } from '../src/kustomize.js'
 
 jest.mock('@actions/core') // suppress logs
 

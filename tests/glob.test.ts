@@ -1,5 +1,5 @@
-import { Kustomization } from '../src/build'
-import { globKustomization } from '../src/glob'
+import { Kustomization } from '../src/build.js'
+import { globKustomization } from '../src/glob.js'
 
 test('run successfully', async () => {
   process.chdir(__dirname)
