@@ -22,13 +22,6 @@ runs:
         ref: ${{ github.base_ref }}
         path: _base_ref
 
-    - uses: int128/hide-comment-action@850168a162175291c7f4e75f8a223fb4d23402a2 # v1.31.0
-      with:
-        token: ${{ inputs.token }}
-        ends-with: |
-          <!-- kustomize-action -->
-          <!-- diff-action -->
-
     - uses: int128/kustomize-action@78a1dd3a437c7c1247ab7a3e053983fd56a3d956 # v1.54.0
       id: kustomize-head
       with:
