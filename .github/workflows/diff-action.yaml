@@ -1,0 +1,17 @@
+name: diff-action
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/diff-action.yaml
+      - diff/**
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./diff
+        with:
+          kustomization: tests/fixtures/overlays/*/kustomization.yaml
