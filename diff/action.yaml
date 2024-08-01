@@ -22,14 +22,14 @@ runs:
         ref: ${{ github.base_ref }}
         path: _base_ref
 
-    - uses: int128/kustomize-action@479bca4a98eaa1b535a7e6c629895d539f8e4ba0 # v1.132.0
+    - uses: int128/kustomize-action@cad085c3b3d508189580c64bef807c966cf2083e # v1.133.0
       id: kustomize-head
       with:
         token: ${{ inputs.token }}
         write-individual-files: ${{ inputs.write-individual-files }}
         kustomization: ${{ inputs.kustomization }}
 
-    - uses: int128/kustomize-action@479bca4a98eaa1b535a7e6c629895d539f8e4ba0 # v1.132.0
+    - uses: int128/kustomize-action@cad085c3b3d508189580c64bef807c966cf2083e # v1.133.0
       id: kustomize-base
       with:
         token: ${{ inputs.token }}
