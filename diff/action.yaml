@@ -38,7 +38,7 @@ runs:
         kustomization: ${{ inputs.kustomization }}
         ignore-kustomize-error: true
 
-    - uses: int128/diff-action@915c60aa5cb5c973f5f39d1e59cff13bc1fa3c6e # v1.40.0
+    - uses: ../
       with:
         token: ${{ inputs.token }}
         base: ${{ steps.kustomize-base.outputs.directory }}
