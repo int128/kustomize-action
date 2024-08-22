@@ -7,6 +7,9 @@ inputs:
   extra-files:
     description: glob patterns to extra files to copy
     required: false
+  kustomize-build-args:
+    description: extra args to kustomize build command (multiline)
+    required: false
   base-directory:
     description: base directory to compute a relative path of kustomization.yaml
     required: true

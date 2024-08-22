@@ -4,7 +4,7 @@ import * as glob from '@actions/glob'
 import * as os from 'os'
 import { promises as fs } from 'fs'
 import { globKustomization } from './glob.js'
-import { kustomizeBuild } from './build.js'
+import { KustomizeBuildOption, kustomizeBuild } from './build.js'
 import { copyExtraFiles } from './copy.js'
 import { commentErrors, summaryErrors } from './comment.js'
 import * as kustomize from './kustomize.js'
@@ -13,14 +13,12 @@ type Inputs = {
   kustomization: string
   extraFiles: string
   baseDir: string
-  maxProcess: number
-  writeIndividualFiles: boolean
   ignoreKustomizeError: boolean
   errorComment: boolean
   errorCommentHeader: string
   errorCommentFooter: string
   token: string
-} & kustomize.RetryOptions
+} & KustomizeBuildOption
 
 export const run = async (inputs: Inputs): Promise<void> => {
   // ensure kustomize is available
