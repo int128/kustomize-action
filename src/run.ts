@@ -3,11 +3,11 @@ import * as github from '@actions/github'
 import * as glob from '@actions/glob'
 import * as os from 'os'
 import { promises as fs } from 'fs'
-import { globKustomization } from './glob'
-import { KustomizeBuildOption, kustomizeBuild } from './build'
-import { copyExtraFiles } from './copy'
-import { commentErrors, summaryErrors } from './comment'
-import * as kustomize from './kustomize'
+import { globKustomization } from './glob.js'
+import { KustomizeBuildOption, kustomizeBuild } from './build.js'
+import { copyExtraFiles } from './copy.js'
+import { commentErrors, summaryErrors } from './comment.js'
+import * as kustomize from './kustomize.js'
 
 type Inputs = {
   kustomization: string

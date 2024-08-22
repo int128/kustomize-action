@@ -6,7 +6,7 @@ on:
       - src/**
       - tests/**
       - '*.json'
-      - action.yaml
+      - '*.yaml'
       - .github/workflows/ts.yaml
   push:
     branches:
@@ -15,7 +15,7 @@ on:
       - src/**
       - tests/**
       - '*.json'
-      - action.yaml
+      - '*.yaml'
       - .github/workflows/ts.yaml
 
 jobs:
@@ -23,15 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
-          node-version: 16
-          cache: yarn
-      - run: yarn
-      - run: yarn test
-      - run: yarn build
-      - run: yarn package
+          node-version: 20
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm test
+      - run: pnpm build
 
       - id: kustomize-single
         uses: ./
@@ -88,12 +87,12 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
-          node-version: 16
-          cache: yarn
-      - run: yarn
-      - run: yarn lint --fix
-      - run: yarn format
-      - uses: int128/update-generated-files-action@9cf17834a8b281b48b8523a3ba36d178ed71e0f4 # v2.38.0
+          node-version: 20
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm lint --fix
+      - run: pnpm format
+      - uses: int128/update-generated-files-action@d01a193ae8a14d7d7699981665a0922bde444389 # v2.52.0
