@@ -1,50 +1,50 @@
 name: kustomize
-description: run kustomize build
+description: Run kustomize build in parallel
 inputs:
   kustomization:
-    description: glob patterns to kustomization.yaml
+    description: Glob patterns to kustomization.yaml
     required: true
   extra-files:
-    description: glob patterns to extra files to copy
+    description: Glob patterns to extra files to copy
     required: false
   kustomize-build-args:
-    description: extra args to kustomize build command (multiline)
+    description: Extra args to kustomize build command (multiline)
     required: false
   base-directory:
-    description: base directory to compute a relative path of kustomization.yaml
+    description: Base directory to compute a relative path of kustomization.yaml
     required: true
     default: ${{ github.workspace }}
   retry-max-attempts:
-    description: max attempts of retry to run kustomize (0 = no retry)
+    description: Max attempts of retry to run kustomize (0 = no retry)
     required: true
     default: '2'
   retry-wait-ms:
-    description: wait before retry kustomize in milliseconds
+    description: Wait before retry kustomize in milliseconds
     required: true
     default: '2000'
   max-process:
-    description: max number of kustomize processes
+    description: Max number of kustomize processes
     required: true
     default: '5'
   write-individual-files:
-    description: set true to write individual files
+    description: If true, write individual files
     required: true
     default: 'false'
   ignore-kustomize-error:
-    description: set true to ignore kustomize errors
+    description: If true, ignore kustomize errors
     required: true
     default: 'false'
   error-comment:
-    description: post a comment on error
+    description: Post a comment on error
     required: true
     default: 'false'
   error-comment-header:
-    description: header in a comment to post on error
+    description: Header in a comment to post on error
     required: false
     default: |
       ## :x: kustomize error
   error-comment-footer:
-    description: footer in a comment to post on error
+    description: Footer in a comment to post on error
     required: false
     default: |
       <!-- kustomization-action -->

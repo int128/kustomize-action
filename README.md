@@ -2,13 +2,11 @@
 
 This is an action to run `kustomize build` in parallel.
 
-
 ## Problem to solve
 
 If `kustomization.yaml` depends on an external resource such as HTTPS, `kustomize build` takes a long time.
 For GitOps, a manifest repository contains many `kustomization.yaml` and it would be take a very long time to build all.
 This action builds them in parallel to reduce time.
-
 
 ## Getting Started
 
@@ -19,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: int128/kustomize-action@v1
         id: kustomize
         with:
@@ -50,7 +48,7 @@ You can get the base directory from `outputs.directory`, for example,
 
 ### Errors
 
-If `kustomize build` returned an error, 
+If `kustomize build` command returned an error,
 you can see it from GitHub Actions summary page or pull request review comment.
 
 <img width="860" alt="image" src="https://user-images.githubusercontent.com/321266/191903175-24c69251-0ef9-4515-8a24-91c9c3c5e598.png">
@@ -73,10 +71,10 @@ If it is set to true,
 You can set `write-individual-files` to write individual files (see [kustomize#960](https://github.com/kubernetes-sigs/kustomize/pull/960)).
 
 ```yaml
-      - uses: int128/kustomize-action@v1
-        with:
-          kustomization: overlays/*/kustomization.yaml
-          write-individual-files: true
+- uses: int128/kustomize-action@v1
+  with:
+    kustomization: overlays/*/kustomization.yaml
+    write-individual-files: true
 ```
 
 This action writes the individual manifests as follows:
@@ -93,10 +91,10 @@ This action writes the individual manifests as follows:
 You can set `extra-files` to copy the extra files with the results of `kustomize build`.
 
 ```yaml
-      - uses: int128/kustomize-action@v1
-        with:
-          kustomization: overlays/*/kustomization.yaml
-          extra-files: overlays/*/metadata.yaml
+- uses: int128/kustomize-action@v1
+  with:
+    kustomization: overlays/*/kustomization.yaml
+    extra-files: overlays/*/metadata.yaml
 ```
 
 This action writes the generated manifests with the extra files as follows:
@@ -112,37 +110,36 @@ This action writes the generated manifests with the extra files as follows:
 You can add extra args to `kustomize build` command.
 
 ```yaml
-      - uses: int128/kustomize-action@v1
-        with:
-          kustomization: overlays/*/kustomization.yaml
-          kustomize-build-args: |
-            --load-restrictor=LoadRestrictionsNone
+- uses: int128/kustomize-action@v1
+  with:
+    kustomization: overlays/*/kustomization.yaml
+    kustomize-build-args: |
+      --load-restrictor=LoadRestrictionsNone
 ```
-
 
 ## Diff between head and base ref of pull request
 
 When you open or update a pull request, you can see the diff of generated manifests between head and base ref.
-See [kustomize-diff-action](diff/) for details.
 
+See https://github.com/int128/kubebuilder-workflows/blob/v1/.github/workflows/manifest.yaml for example.
 
 ## Inputs
 
-| Name | Default | Description
-|------|----------|------------
-| `kustomization` | (required) | glob patterns to `kustomization.yaml`
-| `kustomize-build-args` | - | extra args to kustomize build command (multiline)
-| `extra-files` | - | glob patterns to extra files to copy
-| `base-directory` | (workspace) | base directory to compute a relative path to `kustomization.yaml`
-| `retry-max-attempts` | 2 | max attempts of retry to run kustomize (0 = no retry)
-| `retry-wait-ms` | 2,000 (2s) | wait before retry kustomize in milliseconds
-| `max-process` | 5 | max number of kustomize processes
-| `write-individual-files` | `false` | set true to write individual files
-| `ignore-kustomize-error` | `false` | set true to ignore kustomize errors
-| `error-comment` | `false` | post a comment on error
-| `error-comment-header` | - | header in a comment to post on error
-| `error-comment-footer` | - | footer in a comment to post on error
-| `token` | `github.token` | GitHub token to post a comment on error
+| Name                     | Default        | Description                                                       |
+| ------------------------ | -------------- | ----------------------------------------------------------------- |
+| `kustomization`          | (required)     | Glob patterns to `kustomization.yaml`                             |
+| `kustomize-build-args`   | -              | Extra args to kustomize build command (multiline)                 |
+| `extra-files`            | -              | Glob patterns to extra files to copy                              |
+| `base-directory`         | (workspace)    | Base directory to compute a relative path to `kustomization.yaml` |
+| `retry-max-attempts`     | 2              | Max attempts of retry to run kustomize (0 = no retry)             |
+| `retry-wait-ms`          | 2,000 (2s)     | Wait before retry kustomize in milliseconds                       |
+| `max-process`            | 5              | Max number of kustomize processes                                 |
+| `write-individual-files` | `false`        | If true, write individual files                                   |
+| `ignore-kustomize-error` | `false`        | If true, ignore kustomize errors                                  |
+| `error-comment`          | `false`        | Post a comment on error                                           |
+| `error-comment-header`   | -              | Header in a comment to post on error                              |
+| `error-comment-footer`   | -              | Footer in a comment to post on error                              |
+| `token`                  | `github.token` | GitHub token to post a comment on error                           |
 
 ### Retry options
 
@@ -151,10 +148,9 @@ This action retries if `kustomize` command returned non-zero exit status.
 
 You can turn off the retry by `retry-max-attempts` option.
 
-
 ## Outputs
 
-| Name | Description
-|------|------------
-| `directory` | directory to results of `kustomize build`
-| `files` | multi-line string of files generated by `kustomize build`
+| Name        | Description                                               |
+| ----------- | --------------------------------------------------------- |
+| `directory` | directory to results of `kustomize build`                 |
+| `files`     | multi-line string of files generated by `kustomize build` |
