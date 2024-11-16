@@ -26,28 +26,25 @@ export const run = async (inputs: Inputs): Promise<void> => {
   await kustomize.run(['version'], inputs)
 
   const outputBaseDir = await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`)
-  core.setOutput('directory', outputBaseDir)
   core.info(`writing to ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
   const errors = await kustomizeBuild(kustomizations, inputs)
-  if (inputs.ignoreKustomizeError) {
-    core.info(`kustomize finished with ${errors.length} error(s)`)
-  } else {
-    if (errors.length > 0) {
-      await summaryErrors(errors)
-      if (inputs.errorComment) {
-        const octokit = github.getOctokit(inputs.token)
-        await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
-      }
-      throw new Error(`kustomize build finished with ${errors.length} error(s)`)
-    }
-    core.info(`all of kustomize build successfully finished`)
+  core.info(`kustomize finished with ${errors.length} error(s)`)
+  await summaryErrors(errors)
+  if (errors.length > 0 && inputs.errorComment && !inputs.ignoreKustomizeError) {
+    const octokit = github.getOctokit(inputs.token)
+    await commentErrors(octokit, errors, { header: inputs.errorCommentHeader, footer: inputs.errorCommentFooter })
   }
 
   await copyExtraFiles(inputs.extraFiles, outputBaseDir)
 
-  const globber = await glob.create(outputBaseDir, { matchDirectories: false })
-  const outputFiles = await globber.glob()
+  const outputFilesGlobber = await glob.create(outputBaseDir, { matchDirectories: false })
+  const outputFiles = await outputFilesGlobber.glob()
+  core.setOutput('directory', outputBaseDir)
   core.setOutput('files', outputFiles.join('\n'))
+  core.setOutput('errors', errors.map((error) => error.stderr).join('\n'))
+  if (errors.length > 0 && !inputs.ignoreKustomizeError) {
+    throw new Error(`kustomize build finished with ${errors.length} error(s)`)
+  }
 }
