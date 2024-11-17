@@ -1,3 +1,2 @@
 patches:
   - path: service.yaml
-  - path: deployment.yaml
