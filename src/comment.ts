@@ -10,26 +10,22 @@ type CommentOptions = {
   footer: string
 }
 
-export const commentErrors = async (octokit: Octokit, errors: KustomizeError[], o: CommentOptions): Promise<void> => {
+export const commentErrors = async (octokit: Octokit, body: string, o: CommentOptions): Promise<void> => {
   if (github.context.payload.pull_request === undefined) {
     return
   }
-
-  const body = [o.header, errors.map(errorTemplate).join('\n'), o.footer].join('\n')
 
   const { data } = await octokit.rest.issues.createComment({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: github.context.payload.pull_request.number,
-    body,
+    body: [o.header, body, o.footer].join('\n'),
   })
   core.info(`created a comment as ${data.html_url}`)
 }
 
-export const summaryErrors = async (errors: KustomizeError[]) => {
-  core.summary.addRaw(`kustomize build finished with ${errors.length} error(s)`)
-  core.summary.addRaw(errors.map(errorTemplate).join('\n'))
-  await core.summary.write()
+export const formatErrors = (errors: KustomizeError[]): string[] => {
+  return errors.map(errorTemplate)
 }
 
 const errorTemplate = (e: KustomizeError): string => {
