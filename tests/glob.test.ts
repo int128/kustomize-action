@@ -6,11 +6,11 @@ test('run successfully', async () => {
   const got = await globKustomization('fixtures/overlays/*/kustomization.yaml', '/tmp/foo')
   expect(got).toStrictEqual<Kustomization[]>([
     {
-      kustomizationDir: `${__dirname}/fixtures/overlays/development`,
+      kustomizationDir: `fixtures/overlays/development`,
       outputDir: '/tmp/foo/fixtures/overlays/development',
     },
     {
-      kustomizationDir: `${__dirname}/fixtures/overlays/production`,
+      kustomizationDir: `fixtures/overlays/production`,
       outputDir: '/tmp/foo/fixtures/overlays/production',
     },
   ])

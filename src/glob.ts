@@ -4,20 +4,19 @@ import * as path from 'path'
 import { Kustomization } from './build.js'
 
 export const globKustomization = async (patterns: string, outputBaseDir: string): Promise<Kustomization[]> => {
-  const cwd = process.cwd()
   const globber = await glob.create(patterns, { matchDirectories: false })
-  const paths = await globber.glob()
+  const absKustomizationFiles = await globber.glob()
 
   const kustomizations: Kustomization[] = []
-  for (const p of paths) {
-    const stat = await fs.stat(p)
+  for (const absKustomizationFile of absKustomizationFiles) {
+    const stat = await fs.stat(absKustomizationFile)
     if (!stat.isFile()) {
       continue
     }
 
-    const kustomizationDir = path.dirname(p)
-    const relativeDir = path.relative(cwd, kustomizationDir)
-    const outputDir = path.join(outputBaseDir, relativeDir)
+    const absKustomizationDir = path.dirname(absKustomizationFile)
+    const kustomizationDir = path.relative('.', absKustomizationDir)
+    const outputDir = path.join(outputBaseDir, kustomizationDir)
     kustomizations.push({ kustomizationDir, outputDir })
   }
   return kustomizations
