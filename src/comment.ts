@@ -33,7 +33,7 @@ const errorTemplate = (e: KustomizeError): string => {
   return `
 ### ${relativeDir}
 [kustomization.yaml](${kustomizationUrl(relativeDir)}) error:
-\`\`\`
+\`\`\`console
 $ kustomize build ${relativeDir}
 ${e.stderr.trim().replaceAll(':', ':\n')}
 \`\`\`
