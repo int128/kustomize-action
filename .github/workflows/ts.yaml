@@ -74,14 +74,23 @@ jobs:
       - run: test -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/production/generated.yaml
       - run: test ! -f ${{ steps.kustomize-single-with-extra-files.outputs.directory }}/tests/fixtures/overlays/production/metadata.yaml
 
-      - id: kustomize-error
+      - id: kustomize-error-1
         uses: ./
         with:
-          kustomization: tests/fixtures/invalid/kustomization.yaml
+          kustomization: tests/fixtures/invalid-1/kustomization.yaml
           ignore-kustomize-error: true
       - run: echo "$pretty_errors" && test -n "$pretty_errors"
         env:
-          pretty_errors: ${{ steps.kustomize-error.outputs.pretty-errors }}
+          pretty_errors: ${{ steps.kustomize-error-1.outputs.pretty-errors }}
+
+      - id: kustomize-error-2
+        uses: ./
+        with:
+          kustomization: tests/fixtures/invalid-2/kustomization.yaml
+          ignore-kustomize-error: true
+      - run: echo "$pretty_errors" && test -n "$pretty_errors"
+        env:
+          pretty_errors: ${{ steps.kustomize-error-2.outputs.pretty-errors }}
 
   generate:
     runs-on: ubuntu-latest
