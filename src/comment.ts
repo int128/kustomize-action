@@ -32,8 +32,10 @@ const errorTemplate = (e: KustomizeError): string => {
   const relativeDir = path.relative('.', e.kustomization.kustomizationDir)
   return `
 ### ${relativeDir}
-[kustomization.yaml](${kustomizationUrl(relativeDir)}) is invalid:
-<blockquote>${e.stderr.trim()}</blockquote>
+[kustomization.yaml](${kustomizationUrl(relativeDir)}) error:
+\`\`\`
+${e.stderr.replaceAll('\n', '').replaceAll(':', ':\n')}
+\`\`\`
 `
 }
 
