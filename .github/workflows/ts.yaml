@@ -79,6 +79,9 @@ jobs:
         with:
           kustomization: tests/fixtures/invalid/kustomization.yaml
           ignore-kustomize-error: true
+      - run: echo "$pretty_errors" && test -n "$pretty_errors"
+        env:
+          pretty_errors: ${{ steps.kustomize-error.outputs.pretty-errors }}
 
   generate:
     runs-on: ubuntu-latest
