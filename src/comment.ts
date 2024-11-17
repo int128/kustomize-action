@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as path from 'path'
 import { KustomizeError } from './build.js'
 
 type Octokit = ReturnType<typeof github.getOctokit>
@@ -29,10 +28,9 @@ export const formatErrors = (errors: KustomizeError[]): string[] => {
 }
 
 const errorTemplate = (e: KustomizeError): string => {
-  const relativeDir = path.relative('.', e.kustomization.kustomizationDir)
   return `
-### ${relativeDir}
-[kustomization.yaml](${kustomizationUrl(relativeDir)}) error:
+### ${e.kustomization.kustomizationDir}
+[kustomization.yaml](${kustomizationUrl(e.kustomization.kustomizationDir)}) error:
 \`\`\`
 ${e.stderr.replaceAll('\n', '').replaceAll(':', ':\n')}
 \`\`\`
