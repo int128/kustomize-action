@@ -57,10 +57,12 @@ export const run = async (inputs: Inputs): Promise<void> => {
       { data: 'Directory', header: true },
       { data: 'Build', header: true },
     ],
-    ...results.map((result) => [result.kustomization.kustomizationDir, result.success ? ':white_check_mark:' : ':x:']),
+    ...results.map((result) => [
+      result.kustomization.kustomizationDir,
+      result.success ? ':white_check_mark: Success' : ':x: Failure',
+    ]),
   ])
   if (errors.length > 0) {
-    core.summary.addHeading(`Error details`, 3)
     core.summary.addEOL()
     core.summary.addRaw(prettyErrors.join('\n'))
     core.summary.addEOL()
