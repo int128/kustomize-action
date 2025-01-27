@@ -20,7 +20,7 @@ export const commentErrors = async (octokit: Octokit, body: string, o: CommentOp
     issue_number: github.context.payload.pull_request.number,
     body: [o.header, body, o.footer].join('\n'),
   })
-  core.info(`created a comment as ${data.html_url}`)
+  core.info(`Created a comment as ${data.html_url}`)
 }
 
 export const formatErrors = (errors: KustomizeError[]): string[] => {
