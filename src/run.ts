@@ -4,7 +4,7 @@ import * as glob from '@actions/glob'
 import * as os from 'os'
 import { promises as fs } from 'fs'
 import { globKustomization } from './glob.js'
-import { KustomizeBuildOption, kustomizeBuild } from './build.js'
+import { KustomizeBuildOption, KustomizeError, kustomizeBuild } from './build.js'
 import { copyExtraFiles } from './copy.js'
 import { commentErrors, formatErrors } from './comment.js'
 import * as kustomize from './kustomize.js'
@@ -29,9 +29,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.info(`Created an output directory: ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
-  const errors = await kustomizeBuild(kustomizations, inputs)
-  core.info(`kustomize build finished with ${errors.length} errors`)
+  const results = await kustomizeBuild(kustomizations, inputs)
 
+  const errors: KustomizeError[] = results.filter((result) => !result.success)
+  core.info(`kustomize build finished with ${errors.length} errors`)
   const prettyErrors = formatErrors(errors)
   if (errors.length > 0 && inputs.errorComment && !inputs.ignoreKustomizeError) {
     const octokit = github.getOctokit(inputs.token)
@@ -51,10 +52,15 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.setOutput('pretty-errors', prettyErrors.join('\n'))
 
   core.summary.addHeading('kustomize-action summary', 2)
-  if (errors.length === 0) {
-    core.summary.addRaw(':white_check_mark: kustomize build passed')
-  } else {
-    core.summary.addRaw(`:x: kustomize build finished with ${errors.length} errors`)
+  core.summary.addTable([
+    [
+      { data: 'Directory', header: true },
+      { data: 'Build', header: true },
+    ],
+    ...results.map((result) => [result.kustomization.kustomizationDir, result.success ? ':white_check_mark:' : ':x:']),
+  ])
+  if (errors.length > 0) {
+    core.summary.addHeading(`Error details`, 3)
     core.summary.addEOL()
     core.summary.addRaw(prettyErrors.join('\n'))
     core.summary.addEOL()

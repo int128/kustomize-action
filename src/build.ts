@@ -15,15 +15,23 @@ export type KustomizeBuildOption = kustomize.RetryOptions & {
   writeIndividualFiles: boolean
 }
 
+export type KustomizeResult = KustomizeSuccess | KustomizeError
+
+export type KustomizeSuccess = {
+  kustomization: Kustomization
+  success: true
+}
+
 export type KustomizeError = {
   kustomization: Kustomization
+  success: false
   stderr: string
 }
 
 export const kustomizeBuild = async (
   kustomizations: Kustomization[],
   option: KustomizeBuildOption,
-): Promise<KustomizeError[]> => {
+): Promise<KustomizeResult[]> => {
   if (option.maxProcess < 1) {
     throw new Error(`maxProcess must be a positive number but was ${option.maxProcess}`)
   }
@@ -31,14 +39,7 @@ export const kustomizeBuild = async (
   for (const kustomization of kustomizations) {
     tasks.push(async () => await build(kustomization, option))
   }
-  const results = await executor.execute(tasks, option.maxProcess)
-  const errors = []
-  for (const result of results) {
-    if (result) {
-      errors.push(result)
-    }
-  }
-  return errors
+  return await executor.execute(tasks, option.maxProcess)
 }
 
 const ansi = {
@@ -47,7 +48,7 @@ const ansi = {
   blue: '\u001b[34m',
 }
 
-const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<KustomizeError | void> => {
+const build = async (task: Kustomization, option: KustomizeBuildOption): Promise<KustomizeResult> => {
   await io.mkdirP(task.outputDir)
 
   const args = ['build', task.kustomizationDir]
@@ -72,7 +73,10 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
       core.info(output.stderr)
     }
     core.endGroup()
-    return
+    return {
+      kustomization: task,
+      success: true,
+    }
   }
 
   const relativeFile = path.join(path.relative('.', task.kustomizationDir), 'kustomization.yaml')
@@ -88,7 +92,8 @@ const build = async (task: Kustomization, option: KustomizeBuildOption): Promise
     })
   }
   return {
-    stderr: output.stderr,
     kustomization: task,
+    success: false,
+    stderr: output.stderr,
   }
 }
