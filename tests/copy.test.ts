@@ -1,11 +1,12 @@
+import { it, expect, vi } from 'vitest'
 import * as io from '@actions/io'
 import { copyExtraFiles } from '../src/copy.js'
 
-jest.mock('@actions/io')
-const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>>
-const cpMock = io.cp as jest.Mock<Promise<void>>
+vi.mock('@actions/io')
+const mkdirPMock = vi.mocked(io).mkdirP
+const cpMock = vi.mocked(io).cp
 
-test('run successfully', async () => {
+it('run successfully', async () => {
   mkdirPMock.mockResolvedValue()
   cpMock.mockResolvedValue()
 

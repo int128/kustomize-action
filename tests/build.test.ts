@@ -1,21 +1,22 @@
+import { it, expect, vi, test } from 'vitest'
 import * as exec from '@actions/exec'
 import * as io from '@actions/io'
 import { Kustomization, kustomizeBuild } from '../src/build.js'
 import { RetryOptions } from '../src/kustomize.js'
 
-jest.mock('@actions/core') // suppress logs
+vi.mock('@actions/core') // suppress logs
 
-jest.mock('@actions/exec')
-jest.mock('@actions/io')
-const execMock = exec.getExecOutput as jest.Mock<Promise<exec.ExecOutput>, [string, string[]]>
-const mkdirPMock = io.mkdirP as jest.Mock<Promise<void>, [string]>
+vi.mock('@actions/exec')
+vi.mock('@actions/io')
+const execMock = vi.mocked(exec).getExecOutput
+const mkdirPMock = vi.mocked(io).mkdirP
 
 const noRetry: RetryOptions = {
   retryMaxAttempts: 0,
   retryWaitMs: 0,
 }
 
-test('nothing', async () => {
+it('nothing', async () => {
   const results = await kustomizeBuild([], {
     kustomizeBuildArgs: [],
     maxProcess: 1,
@@ -27,7 +28,7 @@ test('nothing', async () => {
   expect(execMock).not.toHaveBeenCalled()
 })
 
-test('build a directory', async () => {
+it('build a directory', async () => {
   execMock.mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
   const results = await kustomizeBuild(
     [
@@ -63,7 +64,7 @@ test('build a directory', async () => {
   ])
 })
 
-test('build a directory to individual files', async () => {
+it('build a directory to individual files', async () => {
   execMock.mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
   const results = await kustomizeBuild(
     [
@@ -94,7 +95,7 @@ test('build a directory to individual files', async () => {
   expect(execMock.mock.calls[0][1]).toStrictEqual(['build', '/fixtures/development', '-o', '/output/development'])
 })
 
-test('build a directory with an error', async () => {
+it('build a directory with an error', async () => {
   execMock.mockResolvedValue({ exitCode: 1, stdout: '', stderr: 'error' })
   const results = await kustomizeBuild(
     [
