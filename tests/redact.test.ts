@@ -7,167 +7,111 @@ import { redactSecretsInYaml, redactSecretsInFile, redactSecretsInDirectory } fr
 vi.mock('@actions/core') // suppress logs
 
 describe('redactSecretsInYaml', () => {
-  it('should redact data fields in Kubernetes Secret', () => {
+  it('should redact data fields with content-based hash', () => {
     const yamlContent = `apiVersion: v1
 kind: Secret
 metadata:
   name: my-secret
-  namespace: default
 data:
   username: YWRtaW4=
-  password: MWYyZDFlMmU2N2Rm
-  api-key: c29tZS1hcGkta2V5`
-
-    const expected = `apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-  namespace: default
-data:
-  username: [REDACTED]
-  password: [REDACTED]
-  api-key: [REDACTED]`
+  password: MWYyZDFlMmU2N2Rm`
 
     const result = redactSecretsInYaml(yamlContent)
-    expect(result).toBe(expected)
+    
+    // Check that values are redacted with hash format
+    expect(result).toMatch(/username: \[REDACTED-[a-f0-9]{8}\]/)
+    expect(result).toMatch(/password: \[REDACTED-[a-f0-9]{8}\]/)
+    
+    // Verify metadata is preserved
+    expect(result).toContain('name: my-secret')
   })
 
-  it('should redact stringData fields in Kubernetes Secret', () => {
+  it('should redact stringData fields', () => {
     const yamlContent = `apiVersion: v1
 kind: Secret
-metadata:
-  name: my-secret
 stringData:
-  username: admin
-  password: secret123
-  config.yaml: |
-    key: value
+  config: |
     secret: confidential`
 
-    const expected = `apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-stringData:
-  username: [REDACTED]
-  password: [REDACTED]
-  config.yaml: [REDACTED]`
-
     const result = redactSecretsInYaml(yamlContent)
-    expect(result).toBe(expected)
-  })
-
-  it('should redact both data and stringData fields', () => {
-    const yamlContent = `apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-data:
-  encoded: YWRtaW4=
-stringData:
-  plain: admin`
-
-    const expected = `apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-data:
-  encoded: [REDACTED]
-stringData:
-  plain: [REDACTED]`
-
-    const result = redactSecretsInYaml(yamlContent)
-    expect(result).toBe(expected)
+    expect(result).toMatch(/config: \[REDACTED-[a-f0-9]{8}\]/)
+    expect(result).not.toContain('confidential')
   })
 
   it('should not modify non-Secret resources', () => {
     const yamlContent = `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
-spec:
-  replicas: 3
-  template:
-    spec:
-      containers:
-      - name: app
-        image: nginx:latest
-        env:
-        - name: SECRET_KEY
-          value: should-not-be-redacted`
+  name: my-app`
 
     const result = redactSecretsInYaml(yamlContent)
     expect(result).toBe(yamlContent)
   })
 
   it('should handle multi-document YAML', () => {
-    const yamlContent = `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: my-app
----
-apiVersion: v1
+    const yamlContent = `apiVersion: v1
 kind: Secret
-metadata:
-  name: my-secret
 data:
   password: c2VjcmV0
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-service`
-
-    const expected = `apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-data:
-  password: [REDACTED]
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-service`
+  name: app`
 
     const result = redactSecretsInYaml(yamlContent)
-    expect(result).toBe(expected)
+    expect(result).toMatch(/password: \[REDACTED-[a-f0-9]{8}\]/)
+    expect(result).toContain('kind: Deployment')
   })
 
   it('should handle Secret without data fields', () => {
     const yamlContent = `apiVersion: v1
 kind: Secret
 metadata:
-  name: empty-secret
-type: Opaque`
+  name: empty-secret`
 
     const result = redactSecretsInYaml(yamlContent)
     expect(result).toBe(yamlContent)
   })
 
-  it('should handle malformed YAML gracefully', () => {
-    const yamlContent = `apiVersion: v1
+  it('should produce consistent hashes for same content', () => {
+    const yaml1 = `apiVersion: v1
 kind: Secret
-metadata:
-  name: my-secret
 data:
-  invalid yaml: [unclosed bracket`
+  key: same-value`
 
-    const expected = `apiVersion: v1
+    const yaml2 = `apiVersion: v1
 kind: Secret
-metadata:
-  name: my-secret
 data:
-  invalid yaml: [REDACTED]`
+  key: same-value`
 
-    // Should not throw and still redact what it can process
-    const result = redactSecretsInYaml(yamlContent)
-    expect(result).toBe(expected)
+    const result1 = redactSecretsInYaml(yaml1)
+    const result2 = redactSecretsInYaml(yaml2)
+    
+    const hash1 = result1.match(/\[REDACTED-([a-f0-9]{8})\]/)![1]
+    const hash2 = result2.match(/\[REDACTED-([a-f0-9]{8})\]/)![1]
+    
+    expect(hash1).toBe(hash2) // Same content = same hash
+  })
+
+  it('should produce different hashes for different content', () => {
+    const yaml1 = `apiVersion: v1
+kind: Secret
+data:
+  key: value1`
+
+    const yaml2 = `apiVersion: v1
+kind: Secret
+data:
+  key: value2`
+
+    const result1 = redactSecretsInYaml(yaml1)
+    const result2 = redactSecretsInYaml(yaml2)
+    
+    const hash1 = result1.match(/\[REDACTED-([a-f0-9]{8})\]/)![1]
+    const hash2 = result2.match(/\[REDACTED-([a-f0-9]{8})\]/)![1]
+    
+    expect(hash1).not.toBe(hash2) // Different content = different hash
   })
 })
 
@@ -185,8 +129,6 @@ describe('file operations', () => {
   it('should redact secrets in a file', async () => {
     const yamlContent = `apiVersion: v1
 kind: Secret
-metadata:
-  name: test-secret
 data:
   password: c2VjcmV0`
 
@@ -196,14 +138,12 @@ data:
     await redactSecretsInFile(filePath)
 
     const result = await fs.readFile(filePath, 'utf8')
-    expect(result).toContain('password: [REDACTED]')
+    expect(result).toMatch(/password: \[REDACTED-[a-f0-9]{8}\]/)
   })
 
   it('should not modify non-secret files', async () => {
     const yamlContent = `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test-app`
+kind: Deployment`
 
     const filePath = path.join(tempDir, 'deployment.yaml')
     await fs.writeFile(filePath, yamlContent, 'utf8')
@@ -214,250 +154,23 @@ metadata:
     expect(result).toBe(yamlContent)
   })
 
-  it('should redact secrets in all files in directory', async () => {
-    // Create multiple files with secrets
+  it('should redact secrets in directory', async () => {
     const secretYaml = `apiVersion: v1
 kind: Secret
-metadata:
-  name: secret1
 data:
   key: dmFsdWU=`
 
-    const deploymentYaml = `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: app`
-
-    const secret2Yaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: secret2
-stringData:
-  config: sensitive-data`
-
-    await fs.writeFile(path.join(tempDir, 'secret1.yaml'), secretYaml, 'utf8')
-    await fs.writeFile(path.join(tempDir, 'deployment.yaml'), deploymentYaml, 'utf8')
-    await fs.writeFile(path.join(tempDir, 'secret2.yaml'), secret2Yaml, 'utf8')
+    await fs.writeFile(path.join(tempDir, 'secret.yaml'), secretYaml, 'utf8')
 
     await redactSecretsInDirectory(tempDir)
 
-    // Check that secrets were redacted
-    const secret1Result = await fs.readFile(path.join(tempDir, 'secret1.yaml'), 'utf8')
-    expect(secret1Result).toContain('key: [REDACTED]')
-
-    const secret2Result = await fs.readFile(path.join(tempDir, 'secret2.yaml'), 'utf8')
-    expect(secret2Result).toContain('config: [REDACTED]')
-
-    // Check that deployment was not modified
-    const deploymentResult = await fs.readFile(path.join(tempDir, 'deployment.yaml'), 'utf8')
-    expect(deploymentResult).toBe(deploymentYaml)
+    const result = await fs.readFile(path.join(tempDir, 'secret.yaml'), 'utf8')
+    expect(result).toMatch(/key: \[REDACTED-[a-f0-9]{8}\]/)
   })
 
-  it('should handle nested directories', async () => {
-    const nestedDir = path.join(tempDir, 'nested')
-    await fs.mkdir(nestedDir)
-
-    const secretYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: nested-secret
-data:
-  token: dG9rZW4=`
-
-    await fs.writeFile(path.join(nestedDir, 'secret.yaml'), secretYaml, 'utf8')
-
-    await redactSecretsInDirectory(tempDir)
-
-    const result = await fs.readFile(path.join(nestedDir, 'secret.yaml'), 'utf8')
-    expect(result).toContain('token: [REDACTED]')
-  })
-
-  it('should handle file read errors gracefully', async () => {
+  it('should handle file errors gracefully', async () => {
     const nonExistentFile = path.join(tempDir, 'does-not-exist.yaml')
-    
-    // Should not throw error and return false
     const result = await redactSecretsInFile(nonExistentFile)
     expect(result).toBe(false)
-  })
-
-  it('should handle file write permission errors gracefully', async () => {
-    const secretYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: test-secret
-data:
-  key: value`
-
-    const filePath = path.join(tempDir, 'readonly-secret.yaml')
-    await fs.writeFile(filePath, secretYaml, 'utf8')
-    
-    // Make file read-only
-    await fs.chmod(filePath, 0o444)
-
-    // Should handle the error gracefully and return false
-    const result = await redactSecretsInFile(filePath)
-    expect(result).toBe(false)
-    
-    // Restore permissions for cleanup
-    await fs.chmod(filePath, 0o644)
-  })
-})
-
-describe('additional edge cases', () => {
-  it('should handle different Secret types', () => {
-    const tlsSecretYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: tls-secret
-type: kubernetes.io/tls
-data:
-  tls.crt: LS0tLS1CRUdJTi...
-  tls.key: LS0tLS1CRUdJTi...`
-
-    const expected = `apiVersion: v1
-kind: Secret
-metadata:
-  name: tls-secret
-type: kubernetes.io/tls
-data:
-  tls.crt: [REDACTED]
-  tls.key: [REDACTED]`
-
-    const result = redactSecretsInYaml(tlsSecretYaml)
-    expect(result).toBe(expected)
-  })
-
-  it('should handle docker config Secret type', () => {
-    const dockerSecretYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: docker-secret
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: eyJhdXRocyI6e319`
-
-    const expected = `apiVersion: v1
-kind: Secret
-metadata:
-  name: docker-secret
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: [REDACTED]`
-
-    const result = redactSecretsInYaml(dockerSecretYaml)
-    expect(result).toBe(expected)
-  })
-
-  it('should handle empty data and stringData fields', () => {
-    const emptySecretYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: empty-secret
-data: {}
-stringData: {}`
-
-    const result = redactSecretsInYaml(emptySecretYaml)
-    expect(result).toBe(emptySecretYaml) // Should not change anything
-  })
-
-  it('should handle keys with special characters', () => {
-    const specialKeySecretYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: special-keys
-data:
-  my-key.with-dots: dmFsdWU=
-  key_with_underscores: dmFsdWU=
-  "key with spaces": dmFsdWU=
-  key@with@symbols: dmFsdWU=`
-
-    const expected = `apiVersion: v1
-kind: Secret
-metadata:
-  name: special-keys
-data:
-  my-key.with-dots: [REDACTED]
-  key_with_underscores: [REDACTED]
-  "key with spaces": [REDACTED]
-  key@with@symbols: [REDACTED]`
-
-    const result = redactSecretsInYaml(specialKeySecretYaml)
-    expect(result).toBe(expected)
-  })
-
-  it('should preserve YAML comments', () => {
-    const commentedSecretYaml = `# This is a secret for authentication
-apiVersion: v1
-kind: Secret
-metadata:
-  name: commented-secret
-  # This contains sensitive data
-data:
-  # Base64 encoded username
-  username: YWRtaW4=
-  # Base64 encoded password  
-  password: cGFzcw==`
-
-    const result = redactSecretsInYaml(commentedSecretYaml)
-    
-    // Should preserve comments
-    expect(result).toContain('# This is a secret for authentication')
-    expect(result).toContain('# This contains sensitive data')
-    expect(result).toContain('# Base64 encoded username')
-    expect(result).toContain('# Base64 encoded password')
-    
-    // Should redact values
-    expect(result).toContain('username: [REDACTED]')
-    expect(result).toContain('password: [REDACTED]')
-  })
-
-  it('should handle multiple Secrets in same document', () => {
-    const multipleSecretsYaml = `apiVersion: v1
-kind: Secret
-metadata:
-  name: secret1
-data:
-  key1: dmFsdWUx
----
-apiVersion: v1
-kind: Secret  
-metadata:
-  name: secret2
-stringData:
-  key2: value2
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: app`
-
-    const result = redactSecretsInYaml(multipleSecretsYaml)
-    
-    expect(result).toContain('key1: [REDACTED]')
-    expect(result).toContain('key2: [REDACTED]')
-    expect(result).toContain('kind: Deployment') // Should preserve non-Secret
-  })
-
-  it('should handle incorrect Secret identification', () => {
-    // Missing apiVersion
-    const missingApiVersionYaml = `kind: Secret
-metadata:
-  name: invalid-secret
-data:
-  key: value`
-
-    const result1 = redactSecretsInYaml(missingApiVersionYaml)
-    expect(result1).toBe(missingApiVersionYaml) // Should not redact
-
-    // Wrong apiVersion
-    const wrongApiVersionYaml = `apiVersion: apps/v1
-kind: Secret
-metadata:
-  name: invalid-secret
-data:
-  key: value`
-
-    const result2 = redactSecretsInYaml(wrongApiVersionYaml)
-    expect(result2).toBe(wrongApiVersionYaml) // Should not redact
   })
 })

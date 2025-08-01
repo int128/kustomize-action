@@ -5,8 +5,16 @@ import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import { promises as fs } from 'fs'
 import * as path from 'path'
+import * as crypto from 'crypto'
 
-const REDACTED_VALUE = '[REDACTED]'
+/**
+ * Generate a redacted value based on the original content
+ * This allows diff tools to detect changes while keeping content secure
+ */
+const getRedactedValue = (originalValue: string): string => {
+  const hash = crypto.createHash('sha256').update(originalValue.trim()).digest('hex').substring(0, 8)
+  return `[REDACTED-${hash}]`
+}
 
 /**
  * Redacts sensitive data in all YAML files within the specified directory
@@ -153,8 +161,9 @@ const redactDataField = (document: string, fieldName: string): string => {
         const key = line.substring(0, colonIndex)
         const valueStart = line.substring(colonIndex + 1).trim()
         
-        // Replace the value with [REDACTED]
-        result.push(`${key}: ${REDACTED_VALUE}`)
+        // Replace the value with content-based redacted value
+        const redactedValue = getRedactedValue(valueStart)
+        result.push(`${key}: ${redactedValue}`)
         
         // Check if this is a multiline value (|, >, etc)
         if (valueStart.match(/^[|>-]/)) {
