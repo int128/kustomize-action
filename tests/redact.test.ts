@@ -123,8 +123,9 @@ data: # This is a comment
   sso-issuer: aHR0cHM6Ly9leGFtcGxlLmNvbQ==`
 
     const result = redactSecretsInYaml(yamlContent)
-    // Should not redact because regex doesn't match data field with comment
-    expect(result).toContain('aHR0cHM6Ly9leGFtcGxlLmNvbQ==')
+    // With js-yaml parser, comments are handled correctly and data is redacted
+    expect(result).toMatch(/sso-issuer: \[REDACTED-[a-f0-9]{8}\]/)
+    expect(result).not.toContain('aHR0cHM6Ly9leGFtcGxlLmNvbQ==')
   })
 
   it('should handle incorrect indentation', () => {

@@ -6,6 +6,7 @@ import * as glob from '@actions/glob'
 import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as crypto from 'crypto'
+import * as yaml from 'js-yaml'
 
 /**
  * Generate a redacted value based on the original content
@@ -74,7 +75,7 @@ export const redactSecretsInYaml = (yamlContent: string): string => {
     }
   })
   
-  return redactedDocuments.join('---')
+  return redactedDocuments.join('\n---\n')
 }
 
 /**
@@ -86,16 +87,46 @@ const redactSecretInDocument = (document: string): string => {
     return document
   }
   
-  // Redact data and stringData fields
-  let redactedDoc = document
-  
-  // Redact data field
-  redactedDoc = redactDataField(redactedDoc, 'data')
-  
-  // Redact stringData field  
-  redactedDoc = redactDataField(redactedDoc, 'stringData')
-  
-  return redactedDoc
+  try {
+    const parsed = yaml.load(document) as Record<string, unknown>
+    
+    // Redact data field
+    if (parsed.data && typeof parsed.data === 'object' && parsed.data !== null) {
+      const dataObj = parsed.data as Record<string, string>
+      for (const key in dataObj) {
+        if (typeof dataObj[key] === 'string') {
+          dataObj[key] = getRedactedValue(dataObj[key])
+        }
+      }
+    }
+    
+    // Redact stringData field
+    if (parsed.stringData && typeof parsed.stringData === 'object' && parsed.stringData !== null) {
+      const stringDataObj = parsed.stringData as Record<string, string>
+      for (const key in stringDataObj) {
+        if (typeof stringDataObj[key] === 'string') {
+          stringDataObj[key] = getRedactedValue(stringDataObj[key])
+        }
+      }
+    }
+    
+    let result = yaml.dump(parsed, { 
+      indent: 2, 
+      lineWidth: -1, 
+      forceQuotes: false,
+      flowLevel: -1
+    }).trim()
+    
+    // Remove quotes around redacted values to match expected format
+    result = result.replace(/["'](\[REDACTED-[a-f0-9]{8}\])["']/g, '$1')
+    
+    return result
+  } catch (error) {
+    // If YAML parsing fails, fall back to original document
+    const message = error instanceof Error ? error.message : String(error)
+    core.debug(`Failed to parse YAML document: ${message}`)
+    return document
+  }
 }
 
 /**
@@ -106,93 +137,3 @@ const isSecretDocument = (document: string): boolean => {
          /^\s*apiVersion:\s*v1\s*$/m.test(document)
 }
 
-/**
- * Redacts values in a specific data field (data or stringData)
- */
-const redactDataField = (document: string, fieldName: string): string => {
-  const lines = document.split('\n')
-  const result: string[] = []
-  let inDataField = false
-  let dataFieldIndent = 0
-  let skipMultilineValue = false
-  let multilineKeyIndent = 0
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const trimmed = line.trim()
-    
-    // Check if we're starting the target field
-    if (new RegExp(`^\\s*${fieldName}:\\s*$`).test(line)) {
-      inDataField = true
-      dataFieldIndent = line.length - line.trimStart().length
-      result.push(line)
-      continue
-    }
-    
-    // If we're in the data field
-    if (inDataField) {
-      const lineIndent = line.length - line.trimStart().length
-      
-      // If line has same or less indentation than field declaration, we're out of the field
-      if (trimmed && lineIndent <= dataFieldIndent) {
-        inDataField = false
-        skipMultilineValue = false
-        result.push(line)
-        continue
-      }
-      
-      // Skip empty lines within data field
-      if (!trimmed) {
-        if (!skipMultilineValue) {
-          result.push(line)
-        }
-        continue
-      }
-      
-      // If we're skipping multiline content, check if this line is still part of it
-      if (skipMultilineValue && lineIndent > multilineKeyIndent) {
-        // Skip lines that are part of a multiline value
-        continue
-      }
-      
-      // If we're in skipMultilineValue but encounter a new key-value pair at same/lower indent, reset state
-      if (skipMultilineValue && lineIndent <= multilineKeyIndent && trimmed.includes(':')) {
-        skipMultilineValue = false
-      }
-      
-      // Check if this is a key-value pair (contains colon and is at the correct indentation level)
-      if (trimmed.includes(':') && !skipMultilineValue) {
-        const colonIndex = line.indexOf(':')
-        const key = line.substring(0, colonIndex)
-        const valueStart = line.substring(colonIndex + 1).trim()
-        
-        // Replace the value with content-based redacted value
-        const redactedValue = getRedactedValue(valueStart)
-        result.push(`${key}: ${redactedValue}`)
-        
-        // Check if this is a multiline value (|, >, etc)
-        if (valueStart.match(/^[|>-]/)) {
-          skipMultilineValue = true
-          multilineKeyIndent = lineIndent
-        } else {
-          skipMultilineValue = false
-        }
-      } else {
-        // If we're not in a multiline value, this might be a regular line
-        if (!skipMultilineValue) {
-          result.push(line)
-        }
-        // If we are in a multiline value but the indentation suggests we're out of it
-        else if (lineIndent <= multilineKeyIndent) {
-          skipMultilineValue = false
-          result.push(line)
-        }
-      }
-    } else {
-      // Not in data field, keep line as is
-      result.push(line)
-    }
-  }
-  
-  return result.join('\n')
-}
