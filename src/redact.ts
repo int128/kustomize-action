@@ -155,6 +155,11 @@ const redactDataField = (document: string, fieldName: string): string => {
         continue
       }
       
+      // If we're in skipMultilineValue but encounter a new key-value pair at same/lower indent, reset state
+      if (skipMultilineValue && lineIndent <= multilineKeyIndent && trimmed.includes(':')) {
+        skipMultilineValue = false
+      }
+      
       // Check if this is a key-value pair (contains colon and is at the correct indentation level)
       if (trimmed.includes(':') && !skipMultilineValue) {
         const colonIndex = line.indexOf(':')

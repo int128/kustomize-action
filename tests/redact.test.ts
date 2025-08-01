@@ -113,6 +113,64 @@ data:
     
     expect(hash1).not.toBe(hash2) // Different content = different hash
   })
+
+  it('should handle data field with comments', () => {
+    const yamlContent = `apiVersion: v1
+kind: Secret
+metadata:
+  name: test-secret
+data: # This is a comment
+  sso-issuer: aHR0cHM6Ly9leGFtcGxlLmNvbQ==`
+
+    const result = redactSecretsInYaml(yamlContent)
+    // Should not redact because regex doesn't match data field with comment
+    expect(result).toContain('aHR0cHM6Ly9leGFtcGxlLmNvbQ==')
+  })
+
+  it('should handle incorrect indentation', () => {
+    const yamlContent = `apiVersion: v1
+kind: Secret
+metadata:
+  name: test-secret
+data:
+sso-issuer: aHR0cHM6Ly9leGFtcGxlLmNvbQ==`
+
+    const result = redactSecretsInYaml(yamlContent)
+    // Should not redact because incorrect indentation
+    expect(result).toContain('aHR0cHM6Ly9leGFtcGxlLmNvbQ==')
+  })
+
+  it('should not redact non-v1 Secrets', () => {
+    const yamlContent = `apiVersion: v2
+kind: Secret
+metadata:
+  name: test-secret
+data:
+  sso-issuer: aHR0cHM6Ly9leGFtcGxlLmNvbQ==`
+
+    const result = redactSecretsInYaml(yamlContent)
+    // Should not redact because apiVersion is not v1
+    expect(result).toBe(yamlContent)
+  })
+
+  it('should handle multiline values followed by regular values', () => {
+    const yamlContent = `apiVersion: v1
+kind: Secret
+metadata:
+  name: test-secret
+data:
+  config: |
+    server:
+      host: example.com
+      port: 443
+  sso-issuer: aHR0cHM6Ly9leGFtcGxlLmNvbQ==`
+
+    const result = redactSecretsInYaml(yamlContent)
+    // Both values should be redacted
+    expect(result).toMatch(/config: \[REDACTED-[a-f0-9]{8}\]/)
+    expect(result).toMatch(/sso-issuer: \[REDACTED-[a-f0-9]{8}\]/)
+    expect(result).not.toContain('aHR0cHM6Ly9leGFtcGxlLmNvbQ==')
+  })
 })
 
 describe('file operations', () => {
