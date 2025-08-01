@@ -115,7 +115,7 @@ const redactSecretInDocument = (document: string): string => {
       lineWidth: -1, 
       forceQuotes: false,
       flowLevel: -1
-    }).trim()
+    }).trimEnd()
     
     // Remove quotes around redacted values to match expected format
     result = result.replace(/["'](\[REDACTED-[a-f0-9]{8}\])["']/g, '$1')
