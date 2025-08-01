@@ -7,6 +7,7 @@ import { globKustomization } from './glob.js'
 import { KustomizeBuildOption, KustomizeError, kustomizeBuild } from './build.js'
 import { copyExtraFiles } from './copy.js'
 import { commentErrors, formatErrors } from './comment.js'
+import { redactSecretsInDirectory } from './redact.js'
 import * as kustomize from './kustomize.js'
 
 type Inputs = {
@@ -14,6 +15,7 @@ type Inputs = {
   extraFiles: string
   baseDir: string
   ignoreKustomizeError: boolean
+  redactSecrets: boolean
   errorComment: boolean
   errorCommentHeader: string
   errorCommentFooter: string
@@ -40,6 +42,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
       header: inputs.errorCommentHeader,
       footer: inputs.errorCommentFooter,
     })
+  }
+
+  if (inputs.redactSecrets) {
+    await core.group('Redacting secrets', async () => await redactSecretsInDirectory(outputBaseDir))
   }
 
   await core.group('Copying the extra files', async () => await copyExtraFiles(inputs.extraFiles, outputBaseDir))
