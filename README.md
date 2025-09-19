@@ -138,6 +138,19 @@ You can add extra args to `kustomize build` command.
       --load-restrictor=LoadRestrictionsNone
 ```
 
+### Redact secrets
+
+You can redact sensitive data in Kubernetes Secrets from the build output.
+
+```yaml
+- uses: int128/kustomize-action@v1
+  with:
+    kustomization: overlays/*/kustomization.yaml
+    redact-secrets: true
+```
+
+When enabled, this will replace all values in `data` and `stringData` fields of Kubernetes Secret resources with `[REDACTED]` in the generated manifests.
+
 ## Diff between head and base ref of pull request
 
 When you open or update a pull request, you can see the diff of generated manifests between head and base ref.
@@ -157,6 +170,7 @@ See https://github.com/int128/kubebuilder-workflows/blob/v1/.github/workflows/ma
 | `max-process`            | 5              | Max number of kustomize processes                                 |
 | `write-individual-files` | `false`        | If true, write individual files                                   |
 | `ignore-kustomize-error` | `false`        | If true, ignore kustomize errors                                  |
+| `redact-secrets`         | `false`        | If true, redact sensitive data in Kubernetes Secrets             |
 | `token`                  | `github.token` | GitHub token to post a comment on error                           |
 
 ### Retry options
