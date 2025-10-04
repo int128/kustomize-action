@@ -34,6 +34,10 @@ inputs:
     description: If true, ignore kustomize errors
     required: true
     default: 'false'
+  redact-secrets:
+    description: If true, redact sensitive data in Kubernetes Secrets
+    required: true
+    default: 'false'
   error-comment:
     deprecationMessage: Use pretty-errors instead. See https://github.com/int128/kustomize-action#error-comment
     description: Post a comment on error
