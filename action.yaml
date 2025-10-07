@@ -14,6 +14,9 @@ inputs:
     description: Base directory to compute a relative path of kustomization.yaml
     required: true
     default: ${{ github.workspace }}
+  output-directory:
+    description: Directory to write kustomize build results (defaults to a temporary directory)
+    required: false
   retry-max-attempts:
     description: Max attempts of retry to run kustomize (0 = no retry)
     required: true
