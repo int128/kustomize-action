@@ -7,6 +7,7 @@ const main = async (): Promise<void> => {
     kustomizeBuildArgs: core.getMultilineInput('kustomize-build-args'),
     extraFiles: core.getInput('extra-files'),
     baseDir: core.getInput('base-directory', { required: true }),
+    outputDir: core.getInput('output-directory'),
     maxProcess: parseInt(core.getInput('max-process', { required: true })),
     retryMaxAttempts: parseInt(core.getInput('retry-max-attempts', { required: true })),
     retryWaitMs: parseInt(core.getInput('retry-wait-ms', { required: true })),
