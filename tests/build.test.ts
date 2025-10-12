@@ -53,7 +53,7 @@ it('build a directory', async () => {
       success: true,
     },
   ])
-  expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
+  expect(mkdirPMock).toHaveBeenCalledExactlyOnceWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
   expect(execMock.mock.calls[0][0]).toBe('kustomize')
   expect(execMock.mock.calls[0][1]).toStrictEqual([
@@ -89,7 +89,7 @@ it('build a directory to individual files', async () => {
       success: true,
     },
   ])
-  expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
+  expect(mkdirPMock).toHaveBeenCalledExactlyOnceWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
   expect(execMock.mock.calls[0][0]).toBe('kustomize')
   expect(execMock.mock.calls[0][1]).toStrictEqual(['build', '/fixtures/development', '-o', '/output/development'])
@@ -113,7 +113,7 @@ it('build a directory with an error', async () => {
   )
   expect(results).toHaveLength(1)
   expect(results[0].success).toBe(false)
-  expect(mkdirPMock).toHaveBeenCalledWith('/output/development')
+  expect(mkdirPMock).toHaveBeenCalledExactlyOnceWith('/output/development')
   expect(execMock).toHaveBeenCalledTimes(1)
 })
 
@@ -152,7 +152,7 @@ test.each`
 
     expect(execMock).toHaveBeenCalledTimes(overlays)
     for (let i = 0; i < overlays; i++) {
-      expect(mkdirPMock).toHaveBeenCalledWith(`/output/fixture${i}`)
+      expect(mkdirPMock).toHaveBeenCalledExactlyOnceWith(`/output/fixture${i}`)
       expect(execMock.mock.calls[i][0]).toBe('kustomize')
       expect(execMock.mock.calls[i][1]).toStrictEqual([
         'build',
@@ -199,7 +199,7 @@ test.each`
 
     expect(execMock).toHaveBeenCalledTimes(overlays)
     for (let i = 0; i < overlays; i++) {
-      expect(mkdirPMock).toHaveBeenCalledWith(`/output/fixture${i}`)
+      expect(mkdirPMock).toHaveBeenCalledExactlyOnceWith(`/output/fixture${i}`)
       expect(execMock.mock.calls[i][0]).toBe('kustomize')
       expect(execMock.mock.calls[i][1]).toStrictEqual([
         'build',
