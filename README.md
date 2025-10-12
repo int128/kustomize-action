@@ -138,6 +138,23 @@ You can add extra args to `kustomize build` command.
       --load-restrictor=LoadRestrictionsNone
 ```
 
+### Use own output directory
+
+You can set `output-directory` to customize the output location for the build.
+
+```yaml
+- uses: int128/kustomize-action@v1
+  with:
+    kustomization: overlays/*/kustomization.yaml
+    output-directory: ${{ runner.temp }}
+```
+
+This action writes the generated manifests with runner tempory directy as output directory as follows:
+```
+/home/runner/work/_temp/overlays/production/generated.yaml
+/home/runner/work/_temp/overlays/staging/generated.yaml
+```
+
 ## Diff between head and base ref of pull request
 
 When you open or update a pull request, you can see the diff of generated manifests between head and base ref.
@@ -158,6 +175,7 @@ See https://github.com/int128/kubebuilder-workflows/blob/v1/.github/workflows/ma
 | `write-individual-files` | `false`        | If true, write individual files                                   |
 | `ignore-kustomize-error` | `false`        | If true, ignore kustomize errors                                  |
 | `token`                  | `github.token` | GitHub token to post a comment on error                           |
+| `output-directory`       | `/tmp`         | Output directory.                                                 |
 
 ### Retry options
 
