@@ -13,8 +13,8 @@ it('run successfully', async () => {
   process.chdir(__dirname)
   await copyExtraFiles('fixtures/overlays/*/metadata.yaml', '/tmp/foo')
 
-  expect(mkdirPMock).toHaveBeenCalledWith(`/tmp/foo/fixtures/overlays/development`)
-  expect(cpMock).toHaveBeenCalledWith(
+  expect(mkdirPMock).toHaveBeenCalledExactlyOnceWith(`/tmp/foo/fixtures/overlays/development`)
+  expect(cpMock).toHaveBeenCalledExactlyOnceWith(
     `${__dirname}/fixtures/overlays/development/metadata.yaml`,
     `/tmp/foo/fixtures/overlays/development/metadata.yaml`,
   )
