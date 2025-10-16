@@ -1,5 +1,5 @@
-import { it, expect, vi } from 'vitest'
 import * as io from '@actions/io'
+import { expect, it, vi } from 'vitest'
 import { copyExtraFiles } from '../src/copy.js'
 
 vi.mock('@actions/io')

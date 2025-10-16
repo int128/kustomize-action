@@ -1,7 +1,7 @@
+import { promises as fs } from 'node:fs'
+import * as path from 'node:path'
 import * as glob from '@actions/glob'
-import { promises as fs } from 'fs'
-import * as path from 'path'
-import { Kustomization } from './build.js'
+import type { Kustomization } from './build.js'
 
 export const globKustomization = async (patterns: string, outputBaseDir: string): Promise<Kustomization[]> => {
   const globber = await glob.create(patterns, { matchDirectories: false })
