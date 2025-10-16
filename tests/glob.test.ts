@@ -1,5 +1,5 @@
-import { it, expect } from 'vitest'
-import { Kustomization } from '../src/build.js'
+import { expect, it } from 'vitest'
+import type { Kustomization } from '../src/build.js'
 import { globKustomization } from '../src/glob.js'
 
 it('run successfully', async () => {

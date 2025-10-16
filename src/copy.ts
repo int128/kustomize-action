@@ -1,7 +1,7 @@
+import * as path from 'node:path'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as io from '@actions/io'
-import * as path from 'path'
 
 export const copyExtraFiles = async (patterns: string, outputBaseDir: string): Promise<void> => {
   const cwd = process.cwd()
