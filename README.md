@@ -148,7 +148,7 @@ See https://github.com/int128/kubebuilder-workflows/blob/v1/.github/workflows/ma
 
 | Name                     | Default        | Description                                                       |
 | ------------------------ | -------------- | ----------------------------------------------------------------- |
-| `kustomization`          | (required)     | Glob patterns to `kustomization.yaml`                             |
+| `kustomization`          | -              | Glob patterns to `kustomization.yaml`                             |
 | `kustomize-build-args`   | -              | Extra args to kustomize build command (multiline)                 |
 | `extra-files`            | -              | Glob patterns to extra files to copy                              |
 | `base-directory`         | (workspace)    | Base directory to compute a relative path to `kustomization.yaml` |

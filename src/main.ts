@@ -3,7 +3,7 @@ import { run } from './run.js'
 
 const main = async (): Promise<void> => {
   await run({
-    kustomization: core.getInput('kustomization', { required: true }),
+    kustomization: core.getInput('kustomization'),
     kustomizeBuildArgs: core.getMultilineInput('kustomize-build-args'),
     extraFiles: core.getInput('extra-files'),
     baseDir: core.getInput('base-directory', { required: true }),
