@@ -1,12 +1,12 @@
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as glob from '@actions/glob'
-import * as os from 'os'
-import { promises as fs } from 'fs'
-import { globKustomization } from './glob.js'
-import { KustomizeBuildOption, KustomizeError, kustomizeBuild } from './build.js'
-import { copyExtraFiles } from './copy.js'
+import { type KustomizeBuildOption, type KustomizeError, kustomizeBuild } from './build.js'
 import { commentErrors, formatErrors } from './comment.js'
+import { copyExtraFiles } from './copy.js'
+import { globKustomization } from './glob.js'
 import * as kustomize from './kustomize.js'
 
 type Inputs = {

@@ -1,8 +1,8 @@
-import { it, expect, vi, test } from 'vitest'
 import * as exec from '@actions/exec'
 import * as io from '@actions/io'
-import { Kustomization, kustomizeBuild } from '../src/build.js'
-import { RetryOptions } from '../src/kustomize.js'
+import { expect, it, test, vi } from 'vitest'
+import { type Kustomization, kustomizeBuild } from '../src/build.js'
+import type { RetryOptions } from '../src/kustomize.js'
 
 vi.mock('@actions/core') // suppress logs
 
