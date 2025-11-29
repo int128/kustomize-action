@@ -13,6 +13,7 @@ type Inputs = {
   kustomization: string
   extraFiles: string
   baseDir: string
+  outputDir: string
   ignoreKustomizeError: boolean
   errorComment: boolean
   errorCommentHeader: string
@@ -25,7 +26,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   process.chdir(inputs.baseDir)
   await kustomize.run(['version'], inputs)
 
-  const outputBaseDir = await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`)
+  const outputBaseDir = inputs.outputDir || (await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`))
+  if (inputs.outputDir) {
+    await fs.mkdir(outputBaseDir, { recursive: true })
+  }
   core.info(`Created an output directory: ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
