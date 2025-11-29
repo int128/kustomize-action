@@ -32,6 +32,9 @@ const inferIssueNumber = (context: Context): number | undefined => {
   if ('pull_request' in context.payload) {
     return context.payload.pull_request.number
   }
+  if ('issue' in context.payload) {
+    return context.payload.issue.number
+  }
 }
 
 export const formatErrors = (errors: KustomizeError[], context: Context): string[] => {
