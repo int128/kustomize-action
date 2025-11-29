@@ -1,43 +1,52 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import type { Octokit } from '@octokit/action'
 import type { KustomizeError } from './build.js'
-
-type Octokit = ReturnType<typeof github.getOctokit>
+import type { Context } from './github.js'
 
 type CommentOptions = {
   header: string
   footer: string
 }
 
-export const commentErrors = async (octokit: Octokit, body: string, o: CommentOptions): Promise<void> => {
-  if (github.context.payload.pull_request === undefined) {
+export const commentErrors = async (
+  body: string,
+  o: CommentOptions,
+  octokit: Octokit,
+  context: Context,
+): Promise<void> => {
+  const issueNumber = inferIssueNumber(context)
+  if (issueNumber === undefined) {
     return
   }
 
   const { data } = await octokit.rest.issues.createComment({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: github.context.payload.pull_request.number,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    issue_number: issueNumber,
     body: [o.header, body, o.footer].join('\n'),
   })
   core.info(`Created a comment as ${data.html_url}`)
 }
 
-export const formatErrors = (errors: KustomizeError[]): string[] => {
-  return errors.map(errorTemplate)
+const inferIssueNumber = (context: Context): number | undefined => {
+  if ('pull_request' in context.payload) {
+    return context.payload.pull_request.number
+  }
 }
 
-const errorTemplate = (e: KustomizeError): string => {
+export const formatErrors = (errors: KustomizeError[], context: Context): string[] => {
+  return errors.map((error) => errorTemplate(error, context))
+}
+
+const errorTemplate = (e: KustomizeError, context: Context): string => {
   return `
 ### ${e.kustomization.kustomizationDir}
-[kustomization.yaml](${kustomizationUrl(e.kustomization.kustomizationDir)}) error:
+[kustomization.yaml](${kustomizationUrl(e.kustomization.kustomizationDir, context)}) error:
 \`\`\`
 ${e.stderr.replaceAll('\n', '').replaceAll(':', ':\n')}
 \`\`\`
 `
 }
 
-const kustomizationUrl = (directory: string) => {
-  const { serverUrl, repo, sha } = github.context
-  return `${serverUrl}/${repo.owner}/${repo.repo}/blob/${sha}/${directory}/kustomization.yaml`
-}
+const kustomizationUrl = (directory: string, context: Context) =>
+  `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/${directory}/kustomization.yaml`

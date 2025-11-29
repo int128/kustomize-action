@@ -1,11 +1,12 @@
 import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import * as glob from '@actions/glob'
+import type { Octokit } from '@octokit/action'
 import { type KustomizeBuildOption, type KustomizeError, kustomizeBuild } from './build.js'
 import { commentErrors, formatErrors } from './comment.js'
 import { copyExtraFiles } from './copy.js'
+import type { Context } from './github.js'
 import { globKustomization } from './glob.js'
 import * as kustomize from './kustomize.js'
 
@@ -17,10 +18,9 @@ type Inputs = {
   errorComment: boolean
   errorCommentHeader: string
   errorCommentFooter: string
-  token: string
 } & KustomizeBuildOption
 
-export const run = async (inputs: Inputs): Promise<void> => {
+export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<void> => {
   // Ensure kustomize is available
   process.chdir(inputs.baseDir)
   await kustomize.run(['version'], inputs)
@@ -33,13 +33,17 @@ export const run = async (inputs: Inputs): Promise<void> => {
 
   const errors: KustomizeError[] = results.filter((result) => !result.success)
   core.info(`kustomize build finished with ${errors.length} errors`)
-  const prettyErrors = formatErrors(errors)
+  const prettyErrors = formatErrors(errors, context)
   if (errors.length > 0 && inputs.errorComment && !inputs.ignoreKustomizeError) {
-    const octokit = github.getOctokit(inputs.token)
-    await commentErrors(octokit, prettyErrors.join('\n'), {
-      header: inputs.errorCommentHeader,
-      footer: inputs.errorCommentFooter,
-    })
+    await commentErrors(
+      prettyErrors.join('\n'),
+      {
+        header: inputs.errorCommentHeader,
+        footer: inputs.errorCommentFooter,
+      },
+      octokit,
+      context,
+    )
   }
 
   await core.group('Copying the extra files', async () => await copyExtraFiles(inputs.extraFiles, outputBaseDir))
