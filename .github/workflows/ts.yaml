@@ -80,6 +80,7 @@ jobs:
         with:
           kustomization: tests/fixtures/invalid-1/kustomization.yaml
           ignore-kustomize-error: true
+          error-comment: true
       - run: echo "$pretty_errors" && test -n "$pretty_errors"
         env:
           pretty_errors: ${{ steps.kustomize-error-1.outputs.pretty-errors }}
