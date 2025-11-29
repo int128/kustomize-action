@@ -3,7 +3,7 @@ description: Run kustomize build in parallel
 inputs:
   kustomization:
     description: Glob patterns to kustomization.yaml
-    required: true
+    required: false
   extra-files:
     description: Glob patterns to extra files to copy
     required: false
