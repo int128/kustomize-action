@@ -146,18 +146,17 @@ See https://github.com/int128/kubebuilder-workflows/blob/v1/.github/workflows/ma
 
 ## Inputs
 
-| Name                     | Default        | Description                                                       |
-| ------------------------ | -------------- | ----------------------------------------------------------------- |
-| `kustomization`          | (required)     | Glob patterns to `kustomization.yaml`                             |
-| `kustomize-build-args`   | -              | Extra args to kustomize build command (multiline)                 |
-| `extra-files`            | -              | Glob patterns to extra files to copy                              |
-| `base-directory`         | (workspace)    | Base directory to compute a relative path to `kustomization.yaml` |
-| `retry-max-attempts`     | 2              | Max attempts of retry to run kustomize (0 = no retry)             |
-| `retry-wait-ms`          | 2,000 (2s)     | Wait before retry kustomize in milliseconds                       |
-| `max-process`            | 5              | Max number of kustomize processes                                 |
-| `write-individual-files` | `false`        | If true, write individual files                                   |
-| `ignore-kustomize-error` | `false`        | If true, ignore kustomize errors                                  |
-| `token`                  | `github.token` | GitHub token to post a comment on error                           |
+| Name                     | Default     | Description                                                       |
+| ------------------------ | ----------- | ----------------------------------------------------------------- |
+| `kustomization`          | -           | Glob patterns to `kustomization.yaml`                             |
+| `kustomize-build-args`   | -           | Extra args to kustomize build command (multiline)                 |
+| `extra-files`            | -           | Glob patterns to extra files to copy                              |
+| `base-directory`         | (workspace) | Base directory to compute a relative path to `kustomization.yaml` |
+| `retry-max-attempts`     | 2           | Max attempts of retry to run kustomize (0 = no retry)             |
+| `retry-wait-ms`          | 2,000 (2s)  | Wait before retry kustomize in milliseconds                       |
+| `max-process`            | 5           | Max number of kustomize processes                                 |
+| `write-individual-files` | `false`     | If true, write individual files                                   |
+| `ignore-kustomize-error` | `false`     | If true, ignore kustomize errors                                  |
 
 ### Retry options
 
