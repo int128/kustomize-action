@@ -13,7 +13,6 @@ type Inputs = {
   extraFiles: string
   baseDir: string
   ignoreKustomizeError: boolean
-  token: string
 } & KustomizeBuildOption
 
 export const run = async (inputs: Inputs): Promise<void> => {

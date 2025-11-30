@@ -12,7 +12,6 @@ const main = async (): Promise<void> => {
     retryWaitMs: parseInt(core.getInput('retry-wait-ms', { required: true }), 10),
     writeIndividualFiles: core.getBooleanInput('write-individual-files', { required: true }),
     ignoreKustomizeError: core.getBooleanInput('ignore-kustomize-error'),
-    token: core.getInput('token', { required: true }),
   })
 }
 

@@ -34,10 +34,6 @@ inputs:
     description: If true, ignore kustomize errors
     required: true
     default: 'false'
-  token:
-    description: GitHub token to post a comment on error
-    required: true
-    default: ${{ github.token }}
 outputs:
   directory:
     description: Directory to results of kustomize build
