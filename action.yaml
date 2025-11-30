@@ -34,23 +34,6 @@ inputs:
     description: If true, ignore kustomize errors
     required: true
     default: 'false'
-  error-comment:
-    deprecationMessage: Use pretty-errors instead. See https://github.com/int128/kustomize-action#error-comment
-    description: Post a comment on error
-    required: true
-    default: 'false'
-  error-comment-header:
-    deprecationMessage: Use pretty-errors instead. See https://github.com/int128/kustomize-action#error-comment
-    description: Header in a comment to post on error
-    required: false
-    default: |
-      ## :x: kustomize error
-  error-comment-footer:
-    deprecationMessage: Use pretty-errors instead. See https://github.com/int128/kustomize-action#error-comment
-    description: Footer in a comment to post on error
-    required: false
-    default: |
-      <!-- kustomization-action -->
   token:
     description: GitHub token to post a comment on error
     required: true
