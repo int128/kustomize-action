@@ -7,6 +7,7 @@ export type Context = {
   }
   sha: string
   serverUrl: string
+  runnerTemp: string
 }
 
 export const getContext = (): Context => {
@@ -15,6 +16,7 @@ export const getContext = (): Context => {
     repo: getRepo(),
     sha: getEnv('GITHUB_SHA'),
     serverUrl: getEnv('GITHUB_SERVER_URL'),
+    runnerTemp: getEnv('RUNNER_TEMP'),
   }
 }
 
