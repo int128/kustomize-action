@@ -19,7 +19,7 @@
     "js-yaml": "4.1.1",
     "pnpm": "10.24.0",
     "typescript": "5.9.3",
-    "vitest": "4.0.14"
+    "vitest": "4.0.15"
   },
   "engines": {
     "node": "20.x"
