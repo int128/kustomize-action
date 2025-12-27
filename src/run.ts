@@ -1,5 +1,5 @@
 import { promises as fs } from 'node:fs'
-import * as os from 'node:os'
+import * as path from 'node:path'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import { type KustomizeBuildOption, type KustomizeError, kustomizeBuild } from './build.js'
@@ -21,7 +21,7 @@ export const run = async (inputs: Inputs, context: Context): Promise<void> => {
   process.chdir(inputs.baseDir)
   await kustomize.run(['version'], inputs)
 
-  const outputBaseDir = await fs.mkdtemp(`${os.tmpdir()}/kustomize-action-`)
+  const outputBaseDir = await fs.mkdtemp(path.join(context.runnerTemp, `kustomize-action-`))
   core.info(`Created an output directory: ${outputBaseDir}`)
 
   const kustomizations = await globKustomization(inputs.kustomization, outputBaseDir)
