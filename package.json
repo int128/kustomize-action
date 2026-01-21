@@ -2,27 +2,28 @@
   "private": true,
   "scripts": {
     "build": "ncc build --source-map --license licenses.txt src/main.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "check": "biome migrate --write && biome check --fix"
   },
   "type": "module",
   "dependencies": {
-    "@actions/core": "1.11.1",
-    "@actions/exec": "1.1.1",
+    "@actions/core": "2.0.2",
+    "@actions/exec": "2.0.0",
     "@actions/glob": "0.5.0",
     "@actions/io": "2.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.7",
+    "@biomejs/biome": "2.3.11",
     "@tsconfig/node20": "20.1.8",
-    "@types/node": "20.19.25",
+    "@types/node": "20.19.28",
     "@vercel/ncc": "0.38.4",
     "js-yaml": "4.1.1",
-    "pnpm": "10.23.0",
+    "pnpm": "10.28.0",
     "typescript": "5.9.3",
-    "vitest": "4.0.13"
+    "vitest": "4.0.16"
   },
   "engines": {
     "node": "20.x"
   },
-  "packageManager": "pnpm@10.23.0"
+  "packageManager": "pnpm@10.28.0"
 }
