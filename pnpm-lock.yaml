@@ -18,8 +18,8 @@ importers:
         specifier: 0.6.1
         version: 0.6.1
       '@actions/io':
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 3.0.2
+        version: 3.0.2
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.14
@@ -59,9 +59,6 @@ packages:
 
   '@actions/http-client@4.0.0':
     resolution: {integrity: sha512-QuwPsgVMsD6qaPD57GLZi9sqzAZCtiJT8kVBCDpLtxhL5MydQ4gS+DrejtZZPdIYyB1e95uCK9Luyds7ybHI3g==}
-
-  '@actions/io@2.0.0':
-    resolution: {integrity: sha512-Jv33IN09XLO+0HS79aaODsvIRyduiF7NY/F6LYeK5oeUmrsz7aFdRphQjFoESF4jS7lMauDOttKALcpapVDIAg==}
 
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
@@ -668,8 +665,6 @@ snapshots:
     dependencies:
       tunnel: 0.0.6
       undici: 6.23.0
-
-  '@actions/io@2.0.0': {}
 
   '@actions/io@3.0.2': {}
 
