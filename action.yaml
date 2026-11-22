@@ -17,23 +17,23 @@ inputs:
   retry-max-attempts:
     description: Max attempts of retry to run kustomize (0 = no retry)
     required: true
-    default: '2'
+    default: "2"
   retry-wait-ms:
     description: Wait before retry kustomize in milliseconds
     required: true
-    default: '2000'
+    default: "2000"
   max-process:
     description: Max number of kustomize processes
     required: true
-    default: '5'
+    default: "5"
   write-individual-files:
     description: If true, write individual files
     required: true
-    default: 'false'
+    default: "false"
   ignore-kustomize-error:
     description: If true, ignore kustomize errors
     required: true
-    default: 'false'
+    default: "false"
 outputs:
   directory:
     description: Directory to results of kustomize build
@@ -44,5 +44,5 @@ outputs:
   pretty-errors:
     description: Pretty formatted errors of kustomize build
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: "node24"
+  main: "dist/index.js"
